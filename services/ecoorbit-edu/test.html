@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoOrbit Edu API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .section { margin-bottom: 20px; padding: 15px; border-left: 4px solid #007acc; }
+        input, textarea, button { margin: 5px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background-color: #007acc; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #005a9e; }
+        .response { background: #f8f9fa; padding: 10px; border-radius: 4px; margin-top: 10px; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .form-group { margin: 10px 0; }
+        label { display: inline-block; width: 150px; font-weight: bold; }
+        .info { background: #e7f3ff; padding: 10px; border-radius: 4px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>EcoOrbit Edu API Test</h1>
+    
+    <div class="container">
+        <h2>🔧 Server Setup Required</h2>
+        <div class="info">
+            <strong>Before testing, you need to fix the server authentication:</strong>
+            <br>In your <code>app.js</code>, change the auth middleware to:
+            <pre>const authz = (req, res, next) => {
+  req.user = { sub: document.getElementById('userId').value || "default_user" };
+  next();
+};</pre>
+        </div>
+        
+        <div class="form-group">
+            <label for="userId">User ID:</label>
+            <input type="text" id="userId" value="67a1b2c3d4e5f67890123456">
+        </div>
+        <div class="form-group">
+            <label for="baseUrl">Base URL:</label>
+            <input type="text" id="baseUrl" value="http://localhost:4010/api/edu" style="width: 300px;">
+        </div>
+    </div>
+
+    <!-- Class Management -->
+    <div class="container">
+        <h2>🏫 Class Management</h2>
+        
+        <div class="section">
+            <h3>1. Create Class</h3>
+            <input type="text" id="className" placeholder="Class Name" value="Science 101">
+            <input type="text" id="school" placeholder="School" value="Greenwood High">
+            <input type="text" id="gradeLevel" placeholder="Grade Level" value="10">
+            <input type="text" id="subject" placeholder="Subject" value="Science">
+            <input type="text" id="description" placeholder="Description" value="Introduction to Science">
+            <button onclick="createClass()">Create Class</button>
+            <div id="createClassResponse" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h3>2. List My Classes</h3>
+            <button onclick="listMyClasses()">Get My Classes</button>
+            <div id="listClassesResponse" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h3>3. Get Class by ID</h3>
+            <input type="text" id="classId" placeholder="Class ID" value="690fbd0e1f1f9f6ccdde82bd">
+            <button onclick="getClassById()">Get Class</button>
+            <div id="getClassResponse" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h3>4. Join Class</h3>
+            <input type="text" id="joinCode" placeholder="Join Code" value="SCIENCE101">
+            <button onclick="joinClass()">Join Class</button>
+            <div id="joinClassResponse" class="response"></div>
+        </div>
+    </div>
+
+    <!-- Assignment Management -->
+    <div class="container">
+        <h2>📚 Assignment Management</h2>
+        
+        <div class="section">
+            <h3>5. Create Assignment</h3>
+            <input type="text" id="assignmentClassId" placeholder="Class ID" value="690fbd0e1f1f9f6ccdde82bd">
+            <input type="text" id="assignmentTitle" placeholder="Title" value="Homework 1">
+            <textarea id="assignmentDescription" placeholder="Description" rows="3">Complete the exercises</textarea>
+            <input type="number" id="assignmentMaxScore" placeholder="Max Score" value="100">
+            <input type="text" id="assignmentMissionId" placeholder="Mission ID" value="mission_physics_1">
+            <button onclick="createAssignment()">Create Assignment</button>
+            <div id="createAssignmentResponse" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h3>6. List Assignments by Class</h3>
+            <input type="text" id="listAssignmentsClassId" placeholder="Class ID" value="690fbd0e1f1f9f6ccdde82bd">
+            <button onclick="listAssignments()">Get Assignments</button>
+            <div id="listAssignmentsResponse" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h3>7. Submit Assignment</h3>
+            <input type="text" id="submitAssignmentId" placeholder="Assignment ID" value="">
+            <input type="text" id="submitMissionId" placeholder="Mission ID" value="mission_physics_1">
+            <input type="text" id="submitContentUrl" placeholder="Content URL" value="https://example.com/submission.pdf">
+            <textarea id="submitNotes" placeholder="Notes" rows="2">My submission notes</textarea>
+            <button onclick="submitAssignment()">Submit Assignment</button>
+            <div id="submitAssignmentResponse" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h3>8. Grade Submission</h3>
+            <input type="text" id="gradeAssignmentId" placeholder="Assignment ID" value="">
+            <input type="text" id="gradeSubmissionId" placeholder="Submission ID" value="">
+            <input type="number" id="gradeScore" placeholder="Grade (0-100)" value="85">
+            <textarea id="gradeFeedback" placeholder="Feedback" rows="2">Good work!</textarea>
+            <button onclick="gradeSubmission()">Grade Submission</button>
+            <div id="gradeSubmissionResponse" class="response"></div>
+        </div>
+    </div>
+
+    <!-- Progress Tracking -->
+    <div class="container">
+        <h2>📊 Progress Tracking</h2>
+        
+        <div class="section">
+            <h3>9. Get My Progress</h3>
+            <input type="text" id="progressClassId" placeholder="Class ID" value="690fbd0e1f1f9f6ccdde82bd">
+            <button onclick="getMyProgress()">Get Progress</button>
+            <div id="progressResponse" class="response"></div>
+        </div>
+    </div>
+
+    <script>
+        function getHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'x-debug-user-id': document.getElementById('userId').value
+            };
+        }
+
+        function getBaseUrl() {
+            return document.getElementById('baseUrl').value;
+        }
+
+        function displayResponse(elementId, data) {
+            document.getElementById(elementId).textContent = JSON.stringify(data, null, 2);
+        }
+
+        // Class Management Functions
+        async function createClass() {
+            try {
+                const response = await fetch(`${getBaseUrl()}/classes`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        className: document.getElementById('className').value,
+                        school: document.getElementById('school').value,
+                        gradeLevel: document.getElementById('gradeLevel').value,
+                        subject: document.getElementById('subject').value,
+                        description: document.getElementById('description').value
+                    })
+                });
+                const data = await response.json();
+                displayResponse('createClassResponse', data);
+                
+                if (data._id) {
+                    document.getElementById('classId').value = data._id;
+                    document.getElementById('assignmentClassId').value = data._id;
+                    document.getElementById('listAssignmentsClassId').value = data._id;
+                    document.getElementById('progressClassId').value = data._id;
+                }
+                if (data.settings?.joinCode) {
+                    document.getElementById('joinCode').value = data.settings.joinCode;
+                }
+            } catch (error) {
+                displayResponse('createClassResponse', { error: error.message });
+            }
+        }
+
+        async function listMyClasses() {
+            try {
+                const response = await fetch(`${getBaseUrl()}/classes`, {
+                    method: 'GET',
+                    headers: getHeaders()
+                });
+                const data = await response.json();
+                displayResponse('listClassesResponse', data);
+            } catch (error) {
+                displayResponse('listClassesResponse', { error: error.message });
+            }
+        }
+
+        async function getClassById() {
+            try {
+                const classId = document.getElementById('classId').value;
+                const response = await fetch(`${getBaseUrl()}/classes/${classId}`, {
+                    method: 'GET',
+                    headers: getHeaders()
+                });
+                const data = await response.json();
+                displayResponse('getClassResponse', data);
+            } catch (error) {
+                displayResponse('getClassResponse', { error: error.message });
+            }
+        }
+
+        async function joinClass() {
+            try {
+                const response = await fetch(`${getBaseUrl()}/classes/join`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        joinCode: document.getElementById('joinCode').value
+                    })
+                });
+                const data = await response.json();
+                displayResponse('joinClassResponse', data);
+            } catch (error) {
+                displayResponse('joinClassResponse', { error: error.message });
+            }
+        }
+
+        // Assignment Management Functions
+        async function createAssignment() {
+            try {
+                const response = await fetch(`${getBaseUrl()}/assignments`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        classId: document.getElementById('assignmentClassId').value,
+                        title: document.getElementById('assignmentTitle').value,
+                        description: document.getElementById('assignmentDescription').value,
+                        maxScore: parseInt(document.getElementById('assignmentMaxScore').value),
+                        missionId: document.getElementById('assignmentMissionId').value
+                    })
+                });
+                const data = await response.json();
+                displayResponse('createAssignmentResponse', data);
+                
+                if (data._id) {
+                    document.getElementById('submitAssignmentId').value = data._id;
+                    document.getElementById('gradeAssignmentId').value = data._id;
+                }
+            } catch (error) {
+                displayResponse('createAssignmentResponse', { error: error.message });
+            }
+        }
+
+        async function listAssignments() {
+            try {
+                const classId = document.getElementById('listAssignmentsClassId').value;
+                const response = await fetch(`${getBaseUrl()}/classes/${classId}/assignments`, {
+                    method: 'GET',
+                    headers: getHeaders()
+                });
+                const data = await response.json();
+                displayResponse('listAssignmentsResponse', data);
+                
+                if (data.length > 0) {
+                    document.getElementById('submitAssignmentId').value = data[0]._id || '';
+                    document.getElementById('gradeAssignmentId').value = data[0]._id || '';
+                }
+            } catch (error) {
+                displayResponse('listAssignmentsResponse', { error: error.message });
+            }
+        }
+
+        async function submitAssignment() {
+            try {
+                const response = await fetch(`${getBaseUrl()}/assignments/submit`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        assignmentId: document.getElementById('submitAssignmentId').value,
+                        missionId: document.getElementById('submitMissionId').value,
+                        contentUrl: document.getElementById('submitContentUrl').value,
+                        notes: document.getElementById('submitNotes').value
+                    })
+                });
+                const data = await response.json();
+                displayResponse('submitAssignmentResponse', data);
+                
+                if (data.submissions && data.submissions.length > 0) {
+                    const latestSubmission = data.submissions[data.submissions.length - 1];
+                    document.getElementById('gradeSubmissionId').value = latestSubmission._id || '';
+                }
+            } catch (error) {
+                displayResponse('submitAssignmentResponse', { error: error.message });
+            }
+        }
+
+        async function gradeSubmission() {
+            try {
+                const response = await fetch(`${getBaseUrl()}/assignments/grade`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        assignmentId: document.getElementById('gradeAssignmentId').value,
+                        submissionId: document.getElementById('gradeSubmissionId').value,
+                        grade: parseInt(document.getElementById('gradeScore').value),
+                        feedback: document.getElementById('gradeFeedback').value
+                    })
+                });
+                const data = await response.json();
+                displayResponse('gradeSubmissionResponse', data);
+            } catch (error) {
+                displayResponse('gradeSubmissionResponse', { error: error.message });
+            }
+        }
+
+        // Progress Tracking Functions
+        async function getMyProgress() {
+            try {
+                const classId = document.getElementById('progressClassId').value;
+                const response = await fetch(`${getBaseUrl()}/classes/${classId}/my-progress`, {
+                    method: 'GET',
+                    headers: getHeaders()
+                });
+                const data = await response.json();
+                displayResponse('progressResponse', data);
+            } catch (error) {
+                displayResponse('progressResponse', { error: error.message });
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('EcoOrbit Edu API Test Page Loaded');
+        });
+
+    </script>
+    <div class="section">
+        <h3>🚀 Quick Test - Get Existing Class</h3>
+        <button onclick="testGetClass()">Test Get Class 690fbd0e1f1f9f6ccdde82bd</button>
+        <div id="quickTestResponse" class="response"></div>
+    </div>
+    
+    <script>
+    async function testGetClass() {
+        try {
+            const response = await fetch('http://localhost:4010/api/edu/classes/690fbd0e1f1f9f6ccdde82bd');
+            const data = await response.json();
+            displayResponse('quickTestResponse', data);
+        } catch (error) {
+            displayResponse('quickTestResponse', { error: error.message });
+        }
+    }
+    </script>
+    <div class="section">
+        <h3>2. List Assignments for Class</h3>
+        <button onclick="testGetAssignments()">Get Assignments for Science Class</button>
+        <div id="assignmentsTestResponse" class="response"></div>
+    </div>
+    
+    <script>
+    async function testGetAssignments() {
+        try {
+            const response = await fetch('http://localhost:4010/api/edu/classes/690fbd0e1f1f9f6ccdde82bd/assignments');
+            const data = await response.json();
+            displayResponse('assignmentsTestResponse', data);
+        } catch (error) {
+            displayResponse('assignmentsTestResponse', { error: error.message });
+        }
+    }
+    </script>
+    <div class="section">
+        <h3>3. Create Assignment (Fixed)</h3>
+        <button onclick="testCreateAssignment()">Create Science Assignment</button>
+        <div id="createAssignmentTestResponse" class="response"></div>
+    </div>
+    
+    <script>
+    async function testCreateAssignment() {
+        try {
+            const response = await fetch('http://localhost:4010/api/edu/assignments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-debug-user-id': '67a1b2c3d4e5f67890123456'
+                },
+                body: JSON.stringify({
+                    classId: "690fbd0e1f1f9f6ccdde82bd",
+                    title: "Science Homework 1",
+                    description: "Complete the physics exercises",
+                    maxScore: 100,
+                    missionId: "mission_physics_1",
+                    type: "mission"  // Added required field
+                })
+            });
+            const data = await response.json();
+            displayResponse('createAssignmentTestResponse', data);
+        } catch (error) {
+            displayResponse('createAssignmentTestResponse', { error: error.message });
+        }
+    }
+    </script>
+ <div class="section">
+    <h3>4. Submit Assignment (Fixed)</h3>
+    <button onclick="testSubmitAssignment()">Submit Assignment as Student</button>
+    <div id="submitAssignmentTestResponse" class="response"></div>
+</div>
+
+<script>
+async function testSubmitAssignment() {
+    try {
+        const response = await fetch('http://localhost:4010/api/edu/assignments/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-debug-user-id': '67a1b2c3d4e5f67890123457' // Different user (student)
+            },
+            body: JSON.stringify({
+                assignmentId: "690fc30fbbb8943ac1f584ec",
+                missionId: "67a1b2c3d4e5f67890123458", // Proper 24-char hex ObjectId
+                contentUrl: "https://example.com/my-submission.pdf",
+                notes: "I completed all the exercises"
+            })
+        });
+        const data = await response.json();
+        displayResponse('submitAssignmentTestResponse', data);
+    } catch (error) {
+        displayResponse('submitAssignmentTestResponse', { error: error.message });
+    }
+}
+</script>
+<div class="section">
+    <h3>5. Submit Assignment with ID</h3>
+    <button onclick="submitWithId()">Submit Assignment with ID</button>
+    <div id="submitWithIdResponse" class="response"></div>
+</div>
+
+<div class="section">
+    <h3>7. Submit New Assignment (With Fixed Server)</h3>
+    <button onclick="submitNewWithId()">Submit New Assignment</button>
+    <div id="submitNewResponse" class="response"></div>
+</div>
+
+<script>
+async function submitNewWithId() {
+    try {
+        const response = await fetch('http://localhost:4010/api/edu/assignments/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-debug-user-id': '67a1b2c3d4e5f67890123457'
+            },
+            body: JSON.stringify({
+                assignmentId: "690fc30fbbb8943ac1f584ec",
+                missionId: "67a1b2c3d4e5f67890123460",
+                contentUrl: "https://example.com/fixed-submission.pdf",
+                notes: "This should have an _id now"
+            })
+        });
+        const data = await response.json();
+        displayResponse('submitNewResponse', data);
+    } catch (error) {
+        displayResponse('submitNewResponse', { error: error.message });
+    }
+}
+</script>
+
+<div class="section">
+    <h3>9. Grade Submission (Using ProfileId)</h3>
+    <button onclick="gradeWithProfileId()">Grade Using ProfileId</button>
+    <div id="gradeProfileResponse" class="response"></div>
+</div>
+
+<script>
+async function gradeWithProfileId() {
+    try {
+        const response = await fetch('http://localhost:4010/api/edu/assignments/grade', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-debug-user-id': '67a1b2c3d4e5f67890123456' // Teacher
+            },
+            body: JSON.stringify({
+                assignmentId: "690fc30fbbb8943ac1f584ec",
+                profileId: "67a1b2c3d4e5f67890123457", // Student's profileId
+                grade: 92,
+                feedback: "Excellent work! All exercises completed correctly."
+            })
+        });
+        const data = await response.json();
+        displayResponse('gradeProfileResponse', data);
+    } catch (error) {
+        displayResponse('gradeProfileResponse', { error: error.message });
+    }
+}
+</script>
+
+<div class="section">
+    <h3>11. Get Student Progress</h3>
+    <button onclick="testProgress()">Get Student Progress</button>
+    <div id="progressTestResponse" class="response"></div>
+</div>
+
+<script>
+async function testProgress() {
+    try {
+        const response = await fetch('http://localhost:4010/api/edu/classes/690fbd0e1f1f9f6ccdde82bd/my-progress', {
+            method: 'GET',
+            headers: {
+                'x-debug-user-id': '67a1b2c3d4e5f67890123457' // Student
+            }
+        });
+        const data = await response.json();
+        displayResponse('progressTestResponse', data);
+    } catch (error) {
+        displayResponse('progressTestResponse', { error: error.message });
+    }
+}
+</script>
+</body>
+</html>

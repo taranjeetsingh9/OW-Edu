@@ -23,11 +23,11 @@ const CurriculumSchema = new Schema({
 }, { _id: false });
 
 const SettingsSchema = new Schema({
-  joinCode: { type: String, index: true, unique: true, sparse: true },
-  isPublic: { type: Boolean, default: false },
-  allowStudentCollaboration: { type: Boolean, default: true },
-  parentalAccess: { type: Boolean, default: false }
-}, { _id: false });
+  joinCode: { type: String, unique: true, sparse: true },
+      isPublic: { type: Boolean, default: false },
+      allowStudentCollaboration: { type: Boolean, default: true },
+      parentalAccess: { type: Boolean, default: false }
+   });
 
 /* ---------------------- Grade Enum ---------------------- */
 
