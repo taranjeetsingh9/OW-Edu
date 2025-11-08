@@ -27,7 +27,7 @@ async function start() {
   app.get('/health', (req, res) =>
     res.json({ status: 'ok', uptime: process.uptime() })
   );
-  app.use('/auth', require('./routes/auth.routes'));
+  app.use('/auth', require('./routes/authroutes'));
 
   // Start server
   app.listen(config.PORT, () =>

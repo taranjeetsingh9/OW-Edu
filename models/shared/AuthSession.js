@@ -60,7 +60,6 @@ const AuthSessionSchema = new mongoose.Schema({
     type: String,
     unique: true,
     sparse: true,
-    index: true
   },
 
   refreshToken: {

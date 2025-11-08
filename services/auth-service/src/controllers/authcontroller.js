@@ -1,5 +1,5 @@
-const AuthSession = require('../../../models/shared/AuthSession');
-const logger = require('../../../shared/logger');
+const AuthSession = require('../../../../models/shared/AuthSession');
+const logger = require('../../../../shared/logger');
 
 module.exports = {
   async sendOTP(req, res) {
@@ -20,7 +20,7 @@ module.exports = {
       const { mobileNumber, otp } = req.body;
       if (!mobileNumber || !otp) return res.status(400).json({ error: "Missing fields" });
 
-      // TODO: find session, verify code, issue tokens
+  
 
       return res.json({ token: "fakeToken", refresh: "fakeRefresh" });
     } catch (err) {
