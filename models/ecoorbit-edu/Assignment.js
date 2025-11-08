@@ -51,14 +51,6 @@ const ResourceSchema = new Schema({
   description: { type: String, trim: true }
 }, { _id: false });
 
-/**
- * Submissions: allow linking to missions per-feature.
- * - If feature === 'greenlaunch'  -> missionModel = 'GreenLaunchMission'
- * - If feature === 'planetmode'   -> missionModel = 'LandingMission' (or your chosen PM mission model)
- * - If feature === 'orbitwatch'   -> missionModel = 'OrbitData' (adjust to your actual model)
- *
- * We store missionModel explicitly to keep each submission flexible even if the assignment feature changes later.
- */
 const SubmissionSchema = new Schema({
   profileId: { type: Schema.Types.ObjectId, ref: 'Profile', required: true, index: true },
   // Polymorphic mission reference
