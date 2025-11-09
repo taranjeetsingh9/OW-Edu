@@ -4,23 +4,39 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
-const connectMongo = require('./shared/mongo');
-const logger = require('./shared/logger');
-const config = require('./config');
+const connectMongo = require('../../../shared/mongo');
+const logger = require('../../../shared/logger');
+const config = require('../../../config/index');
 
 async function start() {
   await connectMongo();
 
   const app = express();
 
-  // Security
-  app.use(helmet());
-  app.use(cors());
+  // CORS - Allow all origins for development
+  app.use(cors({
+    origin: true,
+    credentials: true
+  }));
+
+  // FIXED: Configure helmet to allow inline event handlers
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrcAttr: ["'unsafe-inline'"], // ADD THIS LINE
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'", "http://localhost:*", "ws://localhost:*"]
+      }
+    },
+    crossOriginEmbedderPolicy: false
+  }));
+
   app.use(express.json());
 
-  // EJS Setup
-  app.set('view engine', 'ejs');
-  app.set('views', path.join(__dirname, 'views'));
+  // Serve static HTML files
   app.use(express.static(path.join(__dirname, 'public')));
 
   // Basic rate limit
@@ -30,41 +46,36 @@ async function start() {
   }));
 
   // Health check
-  app.get('/health', (req, res) =>
-    res.json({ status: 'ok', uptime: process.uptime() })
-  );
-
-  // EJS Routes
-  app.get('/', (req, res) => {
-    res.render('index', { 
-      title: 'EcoOrbit - Space Sustainability Platform',
-      user: null 
+  app.get('/health', (req, res) => {
+    res.json({ 
+      status: 'ok', 
+      uptime: process.uptime(), 
+      service: 'auth',
+      timestamp: new Date().toISOString()
     });
+  });
+
+  // Serve HTML pages
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
   });
 
   app.get('/login', (req, res) => {
-    res.render('login', { 
-      title: 'EcoOrbit - Login',
-      user: null,
-      error: null,
-      step: 'mobile'
-    });
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
   });
 
   app.get('/dashboard', (req, res) => {
-    res.render('dashboard', { 
-      title: 'EcoOrbit - Dashboard',
-      user: { mobileNumber: '+16471234567' }
-    });
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
   });
 
   // Your existing auth routes
   app.use('/auth', require('./routes/authroutes'));
 
   // Start server
-  app.listen(config.PORT, () =>
-    logger.info(`[eco-orbit] running on port ${config.PORT}`)
-  );
+  app.listen(config.PORT, () => {
+    logger.info(`[auth-service] running on port ${config.PORT}`);
+    logger.info(`[auth-service] Frontend available at http://localhost:${config.PORT}`);
+  });
 }
 
 start();

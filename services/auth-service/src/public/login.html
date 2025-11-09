@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - EcoOrbit 2.0</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .auth-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .auth-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #0B3D91;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="auth-page">
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>EcoOrbit 2.0</h1>
+                <span>Earth to Mars Edition</span>
+            </div>
+            <nav class="nav">
+                <a href="/">Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="auth-container">
+        <div class="auth-card">
+            <h2 style="text-align: center; margin-bottom: 0.5rem; color: #0B3D91;">Welcome Back</h2>
+            <p style="text-align: center; margin-bottom: 2rem; opacity: 0.8;">Sign in to access all EcoOrbit services</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="mobileNumber">Mobile Number</label>
+                    <input type="tel" id="mobileNumber" name="mobileNumber" placeholder="+1 (647) 123-4567" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+            </form>
+            
+            <div style="margin-top: 2rem; text-align: center;">
+                <p>Don't have an account? <a href="#" style="color: #0B3D91;">Contact administrator</a></p>
+            </div>
+            
+            <!-- Demo credentials -->
+            <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; font-size: 0.9rem;">
+                <p><strong>Demo Credentials:</strong></p>
+                <p>Mobile: <code>+16471234567</code></p>
+                <p>Password: <code>any password works</code></p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Simple login that always succeeds for demo
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const mobileNumber = document.getElementById('mobileNumber').value;
+            const password = document.getElementById('password').value;
+            
+            console.log('Login attempt:', { mobileNumber, password });
+            
+            // Show loading
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.textContent = 'Signing In...';
+            submitBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Store demo user data
+                localStorage.setItem('authToken', 'demo-token-' + Date.now());
+                localStorage.setItem('user', JSON.stringify({
+                    mobileNumber: mobileNumber,
+                    name: 'Demo User',
+                    role: 'student'
+                }));
+                
+                // Redirect to dashboard
+                window.location.href = '/dashboard';
+            }, 1000);
+        });
+
+        // Auto-fill demo credentials for testing
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('mobileNumber').value = '+16471234567';
+            document.getElementById('password').value = 'demo123';
+        });
+    </script>
+</body>
+</html>

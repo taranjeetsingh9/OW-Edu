@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - EcoOrbit 2.0</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-container {
+            padding: 2rem 0;
+            min-height: calc(100vh - 80px);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .dashboard-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .dashboard-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .user-info h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .logout-btn {
+            background: var(--danger-color);
+            margin-top: 1rem;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        /* User profile enhancements */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar {
+            font-size: 2rem;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="dashboard-page">
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>EcoOrbit 2.0</h1>
+                <span>Earth to Mars Edition</span>
+            </div>
+            <nav class="nav">
+                <a href="/dashboard" class="active">Dashboard</a>
+                <a href="/">Home</a>
+                <button id="logoutBtn" class="btn btn-outline logout-btn">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>Welcome to Your Dashboard</h1>
+                <p>Access all EcoOrbit services from one place</p>
+            </div>
+            
+            <div class="user-info">
+                <h3>User Profile</h3>
+                <div class="user-profile">
+                    <div class="user-avatar">👨‍🚀</div>
+                    <div class="user-details">
+                        <div style="font-weight: 600; font-size: 1.2rem;" id="userName">Space Explorer</div>
+                        <div style="color: var(--muted);" id="userRole">Student</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%"></div>
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--dark-color);">
+                            <span>Level 3 • </span>
+                            <span id="userXP">650/1000 XP</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="userDetails">
+                    <p><strong>Mobile:</strong> <span id="userMobile">Loading...</span></p>
+                    <p><strong>Status:</strong> <span id="userStatus" style="color: var(--success-color); font-weight: 600;">Active</span></p>
+                </div>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="dashboard-card" data-service="eco-edu">
+                    <div class="service-icon">👨‍🚀</div>
+                    <h3>EcoOrbit EDU</h3>
+                    <p>Gamified learning platform for space sustainability</p>
+                    <div class="service-status" id="edu-dash-status">Checking...</div>
+                </div>
+                
+                <div class="dashboard-card" data-service="greenlaunch">
+                    <div class="service-icon">🚀</div>
+                    <h3>GreenLaunch</h3>
+                    <p>Earth emission tracker and mission planner</p>
+                    <div class="service-status" id="greenlaunch-dash-status">Checking...</div>
+                </div>
+                
+                <div class="dashboard-card" data-service="orbitwatch">
+                    <div class="service-icon">🛰️</div>
+                    <h3>OrbitWatch</h3>
+                    <p>Space debris tracking and collision prevention</p>
+                    <div class="service-status" id="orbitwatch-dash-status">Checking...</div>
+                </div>
+                
+                <div class="dashboard-card" data-service="planetmode">
+                    <div class="service-icon">🌕</div>
+                    <h3>Planet Mode</h3>
+                    <p>Multi-planet landing impact simulator</p>
+                    <div class="service-status" id="planetmode-dash-status">Checking...</div>
+                </div>
+            </div>
+
+            <!-- Quick Stats Section -->
+            <div class="user-info">
+                <h3>Quick Stats</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; color: var(--primary-color);">5</div>
+                        <div style="color: var(--muted);">Missions Completed</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; color: var(--secondary-color);">3</div>
+                        <div style="color: var(--muted);">Badges Earned</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; color: var(--accent-color);">12</div>
+                        <div style="color: var(--muted);">Learning Hours</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; color: var(--warning-color);">87%</div>
+                        <div style="color: var(--muted);">Success Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Dashboard-specific JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard loaded - loading user data');
+            loadUserData();
+            setupCardClickHandlers();
+            setupLogoutHandler();
+        });
+    
+        // Load user data from localStorage
+        function loadUserData() {
+            const user = localStorage.getItem('user');
+            const token = localStorage.getItem('authToken');
+            
+            if (!user || !token) {
+                // Redirect to login if not authenticated
+                window.location.href = '/login';
+                return;
+            }
+            
+            try {
+                const userData = JSON.parse(user);
+                document.getElementById('userMobile').textContent = userData.mobileNumber || '+16471234567';
+                document.getElementById('userName').textContent = userData.name || 'Space Explorer';
+                document.getElementById('userRole').textContent = userData.role || 'Student';
+                
+                // Set demo progress data
+                document.getElementById('userXP').textContent = '650/1000 XP';
+                document.querySelector('.progress-fill').style.width = '65%';
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+            }
+        }
+    
+        // Setup click handlers for dashboard cards
+        function setupCardClickHandlers() {
+            const dashboardCards = document.querySelectorAll('.dashboard-card');
+            dashboardCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const serviceKey = this.getAttribute('data-service');
+                    navigateToService(serviceKey);
+                });
+            });
+        }
+    
+        // Setup logout handler
+        function setupLogoutHandler() {
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            });
+        }
+    </script>
+</body>
+</html>
