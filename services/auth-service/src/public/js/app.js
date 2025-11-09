@@ -1,9 +1,9 @@
 // Service configuration - ONLY services that are actually running
 const SERVICES = {
     'auth': { port: 4000, name: 'Authentication Service' },
-    'eco-edu': { port: 4010, name: 'EcoOrbit EDU' }
+    'eco-edu': { port: 4010, name: 'EcoOrbit EDU' },
     // Comment out services that aren't running yet
-    // 'greenlaunch': { port: 4020, name: 'GreenLaunch' },
+    'greenlaunch': { port: 4020, name: 'GreenLaunch' },
     // 'orbitwatch': { port: 4030, name: 'OrbitWatch' },
     // 'planetmode': { port: 4040, name: 'Planet Mode' }
 };

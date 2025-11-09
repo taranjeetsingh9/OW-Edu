@@ -1,8 +1,7 @@
-// src/services/greenlaunchAiService.js
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const axios = require('axios');
 const { computeEmissionSummary } = require('../utils/emissionCalculator');
 
-const MODEL_NAME = 'gemini-1.5-pro-latest';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 function buildPrompt(summary, tone) {
   return `
@@ -31,35 +30,56 @@ Compliance:
 
 Produce a concise launch briefing in a ${tone} tone.
 Explain the emission numbers, flag Ontario-specific compliance concerns, and suggest:
-1. A technical optimization (fuel/trajectory/hardware).
-2. An operational optimization (weather window, community engagement, offsets).
+1 technical optimization,
+1 operational optimization.
 
-Use short bullet points followed by a single actionable takeaway for students.
-`;
+Finish with one actionable sustainability takeaway for students.
+  `;
 }
 
 async function generateMissionBrief(payload) {
-  const summary = computeEmissionSummary(payload);
-
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error('Missing GEMINI_API_KEY environment variable');
+  if (!apiKey) throw new Error("Missing GEMINI_API_KEY");
+
+  const summary = computeEmissionSummary(payload);
+  const prompt = buildPrompt(summary, payload.tone || "educator");
+
+  try {
+    const response = await axios.post(
+      `${GEMINI_URL}?key=${apiKey}`,
+      {
+        contents: [
+          { parts: [{ text: prompt }] }
+        ],
+        generationConfig: {
+          maxOutputTokens: 800,
+          temperature: 0.7
+        }
+      },
+      {
+        headers: {
+          "Content-Type": "application/json"
+        },
+        timeout: 30000
+      }
+    );
+
+    const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text
+      || "No AI response";
+
+    return {
+      summary,
+      advisory: text
+    };
+
+  } catch (err) {
+    console.error("Gemini error:", err.response?.status, err.message);
+
+    return {
+      summary,
+      advisory: "AI system unavailable. Please try again later."
+    };
   }
-
-  const client = new GoogleGenerativeAI(apiKey);
-  const model = client.getGenerativeModel({ model: MODEL_NAME });
-
-  const prompt = buildPrompt(summary, payload.tone || 'educator');
-  const geminiResponse = await model.generateContent({
-    contents: [{ role: 'user', parts: [{ text: prompt }] }]
-  });
-
-  return {
-    summary,
-    advisory: geminiResponse.response.text()
-  };
 }
 
-module.exports = {
-  generateMissionBrief
-};
+module.exports = { generateMissionBrief };

@@ -1,4 +1,6 @@
 // src/controllers/emissionController.js
+const { computeRiskReport } = require('../utils/riskEngine');
+
 const {
     computeEmissionSummary,
     ROCKET_PROFILES,
@@ -36,8 +38,20 @@ const {
     });
   }
   
+  async function riskReport(req, res) {
+    try {
+      const payload = req.body || {};
+      const summary = computeEmissionSummary(payload);
+      const risk = computeRiskReport(summary);
+      res.json({ summary, risk });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+  
   module.exports = {
     estimateEmissions,
     aiMissionBrief,
-    listReferenceData
+    listReferenceData,
+    riskReport, 
   };
