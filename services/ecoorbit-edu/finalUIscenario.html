@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cosmic Classroom • Mission Console</title>
+  <style>
+    :root{
+      --bg:#0b1220; --bg-2:#0e1628; --panel:#121d33; --panel-2:#172641; --panel-3:#0f1e36;
+      --text:#eaf2ff; --muted:#9db2d7; --accent:#12b4ff; --accent-2:#7cf5ff; --ok:#3bd37f; --warn:#ffcc66; --danger:#ff6b6b; --border:#253a61; --shadow:0 10px 30px rgba(0,0,0,.35);
+      --ring:0 0 0 3px rgba(18,180,255,.25);
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(1200px 800px at 80% -10%,rgba(18,180,255,.12),transparent),linear-gradient(180deg,var(--bg),var(--bg-2));color:var(--text);line-height:1.55}
+
+    /* Layout */
+    .shell{max-width:1200px;margin:0 auto;padding:24px}
+    header.app{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;padding:16px 18px;background:rgba(18,29,51,.65);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);backdrop-filter: blur(6px)}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{font-size:36px}
+    .title{font-weight:800;font-size:22px;letter-spacing:.3px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+    .sub{color:var(--muted);font-size:13px}
+
+    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}
+    @media (max-width:960px){.grid{grid-template-columns:1fr}}
+
+    /* Cards */
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+    .card .hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border)}
+    .card .hd h2{margin:0;font-size:16px}
+    .card .bd{padding:16px}
+
+    /* Inputs */
+    label{display:block;color:var(--muted);font-size:12px;margin:0 0 6px 2px}
+    input,select,textarea,button{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);font:inherit}
+    input:focus,select:focus,textarea:focus{outline:none;box-shadow:var(--ring);border-color:var(--accent)}
+    textarea{min-height:110px;resize:vertical;white-space:pre}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:640px){.row{grid-template-columns:1fr}}
+
+    /* Buttons */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:12px;border:1px solid var(--border);cursor:pointer;background:linear-gradient(135deg,var(--accent),#0f9bd3);color:#06121a;font-weight:700;letter-spacing:.2px}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .btn.secondary{background:transparent;color:var(--text)}
+    .btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+
+    /* Chips & meta */
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:6px 10px;border-radius:999px;background:var(--panel-2);border:1px solid var(--border);font-size:12px;color:var(--muted)}
+    .chip.online::before,.dot{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--ok)}
+    .chip.offline::before{background:var(--danger)}
+
+    /* Empty states & skeletons */
+    .muted{color:var(--muted)}
+    .empty{padding:18px;border:1px dashed var(--border);border-radius:12px;background:rgba(23,38,65,.35)}
+    .skeleton{position:relative;overflow:hidden;background:rgba(255,255,255,.06)}
+    .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);animation:sh 1.2s infinite}
+    @keyframes sh{to{transform:translateX(100%)}}
+
+    /* Summary blocks */
+    .stack{display:grid;gap:12px}
+    .kv{display:grid;grid-template-columns:120px 1fr;gap:8px}
+    .pillrow{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{padding:6px 10px;border-radius:999px;background:var(--panel-3);border:1px solid var(--border);font-size:12px;color:var(--muted)}
+    .divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:8px 0}
+    .caption{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.2px}
+
+    /* Mission list */
+    .mission{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:12px}
+    .mission+.mission{margin-top:10px}
+    .mission .t{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:700}
+    .status{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+    .status .dot{background:var(--muted)}
+    .status.complete .dot{background:var(--ok)}
+    .status.progress .dot{background:var(--warn)}
+
+    /* Toast */
+    .toast{position:fixed;right:18px;bottom:18px;background:#0d1a2e;border:1px solid var(--border);box-shadow:var(--shadow);padding:12px 14px;border-radius:12px;opacity:0;transform:translateY(6px);transition:.25s;z-index:50}
+    .toast.show{opacity:1;transform:translateY(0)}
+
+    /* Accessibility helpers */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="app" role="banner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">🛰️</div>
+        <div>
+          <div class="title">Cosmic Classroom • Mission Console</div>
+          <div class="sub">Ontario curriculum-aligned missions with Gemini fallback</div>
+        </div>
+      </div>
+      <div class="chips" aria-live="polite">
+        <span id="kpi-backend" class="chip skeleton" style="min-width:130px">&nbsp;</span>
+        <!-- <span id="kpi-gemini" class="chip skeleton" style="min-width:130px">&nbsp;</span> -->
+      </div>
+    </header>
+
+    <main class="grid" role="main">
+      <!-- LEFT: Builder & Results -->
+      <section class="card" aria-labelledby="build-h">
+        <div class="hd">
+          <h2 id="build-h">Build Mission</h2>
+          <div class="toolbar">
+            <button id="btn-generate" class="btn" onclick="generateScenario()">🚀 Generate</button>
+            <button class="btn secondary" onclick="getMyScenarios()">🔄 Refresh</button>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="row" style="margin-bottom:12px">
+            <div>
+              <label for="userId">User ID</label>
+              <input id="userId" placeholder="User ID" value="67a1b2c3d4e5f67890123457"/>
+            </div>
+            <div>
+              <label for="gradeLevel">Grade (6–12)</label>
+              <input id="gradeLevel" type="number" min="6" max="12" value="6" />
+            </div>
+          </div>
+          <div class="row" style="margin-bottom:16px">
+            <div>
+              <label for="curriculumCode">Curriculum Code</label>
+              <select id="curriculumCode">
+                <option value="E2.2">Grade 6 — Rocket Propulsion (E2.2)</option>
+                <option value="E2.1">Grade 6 — Solar System (E2.1)</option>
+                <option value="E1.1">Grade 6 — Space Exploration Impact (E1.1)</option>
+                <option value="C1.1">Grade 7 — Heat Transfer (C1.1)</option>
+                <option value="D2.3">Grade 8 — Fluid Dynamics (D2.3)</option>
+                <option value="Z12.1">Grade 12 — Advanced Space Systems (Z12.1)</option>
+              </select>
+            </div>
+            <div>
+              <label for="customTopic">Custom Topic (optional)</label>
+              <input id="customTopic" placeholder="e.g., Water vs Nitrogen in Rockets" value="Water vs Nitrogen in Rockets"/>
+            </div>
+          </div>
+
+          <!-- Mission Summary (pretty only) -->
+          <div class="card" style="margin-top:6px" aria-live="polite">
+            <div class="hd"><h2 style="margin:0;font-size:15px">Mission Details</h2></div>
+            <div class="bd" id="missionSummary">
+              <div class="empty muted">No mission generated yet. Click <strong>Generate</strong> to create one.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Library & Feedback -->
+      <aside class="stack">
+        <section class="card" aria-labelledby="lib-h">
+          <div class="hd">
+            <h2 id="lib-h">My Missions</h2>
+            <div class="toolbar">
+              <button class="btn ghost" onclick="getMyScenarios()">Refresh</button>
+            </div>
+          </div>
+          <div class="bd" id="scenariosList">
+            <div class="empty muted">Loading…</div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="submit-h">
+          <div class="hd"><h2 id="submit-h">Submit Results</h2></div>
+          <div class="bd">
+            <div class="row">
+              <div>
+                <label for="scenarioId">Scenario ID</label>
+                <input id="scenarioId" placeholder="Scenario ID"/>
+              </div>
+              <div>
+                <label for="learningOutcomes">Learning Outcomes (comma separated)</label>
+                <input id="learningOutcomes" value="Understood propellant efficiency, Learned environmental impact"/>
+              </div>
+            </div>
+            <label for="simulatorResults" style="margin-top:10px;display:block">Simulator Results (JSON)</label>
+            <textarea id="simulatorResults">{
+  "emissionSaved": "15%",
+  "fuelEfficiency": "Improved",
+  "environmentalImpact": "Reduced",
+  "missionSuccess": true
+}</textarea>
+            <div class="toolbar" style="margin-top:10px">
+              <button class="btn" onclick="submitScenarioResults()">📨 Submit & Get AI Feedback</button>
+              <button class="btn secondary" onclick="prefillSample()">✨ Prefill Sample</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="feedback-h">
+          <div class="hd"><h2 id="feedback-h">AI Feedback</h2></div>
+          <div class="bd" id="aiFeedback">
+            <div class="empty muted">Feedback will appear here after you submit results. Only feedback is shown — no raw JSON.</div>
+          </div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const BASE_URL = 'http://localhost:4010/api/edu';
+    const $ = (id) => document.getElementById(id);
+
+    /* -------- UI helpers -------- */
+    function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1600) }
+    function headers(){ return { 'Content-Type':'application/json', 'x-debug-user-id': $('userId').value } }
+    function setBusy(btnId, busy, txt){ const b=$(btnId); if(!b) return; b.disabled=busy; b.textContent = busy ? (txt||'Working…') : '🚀 Generate'; }
+    function escapeHTML(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML }
+
+    function field(o, keys, fallback='—'){ for(const k of keys){ if(o && o[k]!=null && o[k]!=='' ) return o[k] } return fallback }
+
+    function truncateList(arr, max=6){ if(!Array.isArray(arr)) return []; const clean=arr.map(x=>typeof x==='string'?x:JSON.stringify(x)); return clean.length>max? clean.slice(0,max): clean }
+
+    /* -------- Renderers (mission minimal) -------- */
+    function renderMissionSummary(data){
+      const root = $('missionSummary');
+      root.innerHTML = '';
+
+      const scenario = data?.scenario || data?.result || data;
+      if(!scenario || typeof scenario !== 'object'){
+        root.innerHTML = '<div class="empty muted">No mission to display.</div>';
+        return;
+      }
+
+      const title = field(scenario, ['title','name']);
+      const id = field(scenario, ['_id','id']);
+      const grade = field(scenario, ['grade','gradeLevel']);
+      const code = field(scenario, ['curriculumCode']);
+      const topic = field(scenario, ['topic','theme']);
+
+      const overview = field(scenario, ['mission','overview','summary','description'], '');
+      const objectives = scenario.objectives || scenario.learningObjectives || scenario.outcomes || [];
+      const keySteps = scenario.steps || scenario.activities || [];
+
+      // Enterprise: show ONLY essential blocks.
+      const frag = document.createDocumentFragment();
+
+      // Header card
+      frag.append(childCard(`<div class="stack">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div style="font-weight:800;font-size:16px">${escapeHTML(String(title||'Untitled Mission'))}</div>
+          <div class="chips"><span class="chip">ID: ${escapeHTML(String(id||'—'))}</span></div>
+        </div>
+        <div class="kv">
+          <div class="muted">Grade</div><div>${escapeHTML(String(grade))}</div>
+          <div class="muted">Curriculum</div><div>${escapeHTML(String(code))}</div>
+          <div class="muted">Topic</div><div>${escapeHTML(String(topic))}</div>
+        </div>
+        ${overview? `<div class="divider"></div><div>${escapeHTML(String(overview))}</div>`:''}
+      </div>`));
+
+      // Objectives (truncated to keep concise)
+      if(Array.isArray(objectives) && objectives.length){
+        frag.append(childCard(`<div class="stack">
+          <div style="font-weight:700">🎯 Learning Objectives</div>
+          <div class="pillrow">${truncateList(objectives,6).map(o=>`<span class="pill">${escapeHTML(String(o))}</span>`).join('')}</div>
+        </div>`));
+      }
+
+      // Key steps (brief, numbered — top 6 only)
+      if(Array.isArray(keySteps) && keySteps.length){
+        frag.append(childCard(`<div class="stack">
+          <div style="font-weight:700">🛠️ Key Activities</div>
+          <ol style="margin:0;padding-left:18px">${truncateList(keySteps,6).map(s=>`<li style="margin-bottom:6px">${escapeHTML(String(s))}</li>`).join('')}</ol>
+        </div>`));
+      }
+
+      root.append(frag);
+    }
+
+    function childCard(inner){ const c=document.createElement('div'); c.className='card'; c.innerHTML = `<div class="bd">${inner}</div>`; return c }
+
+    /* -------- Feedback renderer (feedback only) -------- */
+    function renderFeedbackOnly(data){
+      const root = $('aiFeedback');
+      root.innerHTML = '';
+
+      // Try likely fields
+      const fb = data?.feedback || data?.aiFeedback || data?.result?.feedback || data?.result?.aiFeedback || data?.scenario?.feedback;
+
+      if(!fb){
+        root.innerHTML = '<div class="empty muted">No feedback returned by AI.</div>';
+        return;
+      }
+
+      // Normalize to array of strings
+      let lines = [];
+      if(typeof fb === 'string'){ lines = fb.split(/\n+/).map(s=>s.trim()).filter(Boolean); }
+      else if(Array.isArray(fb)){ lines = fb.map(x=> typeof x==='string'? x : JSON.stringify(x)); }
+      else if(typeof fb === 'object'){
+        // Common shapes: {summary:"...", strengths:[...], improvements:[...]}
+        if(fb.summary) lines.push(String(fb.summary));
+        if(Array.isArray(fb.strengths)) lines.push(...fb.strengths.map(s=>'Strength: '+s));
+        if(Array.isArray(fb.improvements)) lines.push(...fb.improvements.map(s=>'Improve: '+s));
+      }
+
+      if(!lines.length){
+        root.innerHTML = '<div class="empty muted">Feedback field is empty.</div>';
+        return;
+      }
+
+      const block = document.createElement('div');
+      block.className = 'stack';
+      block.innerHTML = `
+        <div class="card"><div class="bd">
+          <div style="font-weight:700;margin-bottom:6px">AI Review</div>
+          <ul style="margin:0;padding-left:18px">${lines.map(li=>`<li style="margin-bottom:6px">${escapeHTML(li)}</li>`).join('')}</ul>
+        </div></div>
+      `;
+      root.append(block);
+    }
+
+    /* -------- Missions list -------- */
+    function renderMissionsList(list){
+      const el = $('scenariosList');
+      if(!Array.isArray(list) || !list.length){
+        el.innerHTML = '<div class="empty muted">No missions yet. Generate your first mission.</div>';
+        return;
+      }
+
+      el.innerHTML = list.map(s=>{
+        const status = s.status||'unknown';
+        const stc = status==='completed'?'status complete': status==='in-progress'?'status progress':'status';
+        const safeTitle = escapeHTML(String(s.title||'Untitled Mission'));
+        const sid = escapeHTML(String(s._id||''));
+        return `
+          <div class="mission">
+            <div class="t">
+              <div>${safeTitle}</div>
+              <div class="${stc}"><span class="dot"></span>${escapeHTML(status)}</div>
+            </div>
+            <div class="chips" style="margin-top:8px">
+              <span class="chip">Grade: ${escapeHTML(String(s.grade ?? '—'))}</span>
+              <span class="chip">Curriculum: ${escapeHTML(String(s.curriculumCode || '—'))}</span>
+              <button class="chip" style="cursor:pointer;background:transparent" title="Copy ID" onclick="navigator.clipboard.writeText('${sid}'); toast('ID copied')">🆔 ${sid||'N/A'}</button>
+              <button class="chip" style="cursor:pointer;background:transparent" onclick="fillScenario('${sid}')">Use</button>
+            </div>
+            ${s.mission? `<div class="muted" style="margin-top:8px">${escapeHTML(String(s.mission)).slice(0,160)}${String(s.mission).length>160?'…':''}</div>`:''}
+          </div>`
+      }).join('');
+    }
+
+    function fillScenario(id){ $('scenarioId').value = id; toast('Scenario ID filled') }
+
+    /* -------- API calls -------- */
+    async function pingBackend(){
+      try {
+        const res = await fetch('http://localhost:4010/health');
+        const chip = $('kpi-backend');
+        if(res.ok){ chip.textContent='Backend: online'; chip.className='chip online'; }
+        else { chip.textContent='Backend: offline'; chip.className='chip offline'; }
+      } catch{ const chip=$('kpi-backend'); chip.textContent='Backend: offline'; chip.className='chip offline' }
+
+      try {
+        const res = await fetch('http://localhost:4010/api/debug-env');
+        const d = await res.json();
+        const chip = $('kpi-gemini');
+        if (d?.hfKeyExists===true || d?.geminiKeyExists===true){ chip.textContent='Gemini key: available'; chip.className='chip online' }
+        else { chip.textContent='Gemini key: missing'; chip.className='chip offline' }
+      } catch{ const chip=$('kpi-gemini'); chip.textContent='Gemini key: unknown'; chip.className='chip offline' }
+    }
+
+    async function generateScenario(){
+      setBusy('btn-generate', true);
+      try{
+        const grade = parseInt($('gradeLevel').value, 10);
+        if (!Number.isInteger(grade) || grade < 6 || grade > 12) throw new Error('Grade must be 6–12');
+
+        const payload = { grade, curriculumCode: $('curriculumCode').value, topic: $('customTopic').value || undefined };
+        const res = await fetch(`${BASE_URL}/scenarios/generate`, { method:'POST', headers: headers(), body: JSON.stringify(payload) });
+        const data = await res.json();
+
+        renderMissionSummary(data); // pretty only
+
+        const newId = data?.scenario?._id || data?._id; if(newId) $('scenarioId').value = newId;
+        toast('Mission generated successfully');
+        getMyScenarios();
+      } catch(e){
+        $('missionSummary').innerHTML = `<div class="empty muted">Failed to generate mission: ${escapeHTML(e.message)}</div>`;
+      } finally { setBusy('btn-generate', false) }
+    }
+
+    async function getMyScenarios(){
+      const el = $('scenariosList');
+      el.innerHTML = '<div class="empty muted">Loading…</div>';
+      try{
+        const res = await fetch(`${BASE_URL}/scenarios/my-scenarios`, { headers: headers() });
+        const data = await res.json();
+        renderMissionsList(Array.isArray(data)? data : []);
+      }catch(e){ el.innerHTML = `<div class="empty muted">Error loading missions: ${escapeHTML(e.message)}</div>` }
+    }
+
+    async function submitScenarioResults(){
+      try{
+        const learningOutcomes = $('learningOutcomes').value.split(',').map(s=>s.trim()).filter(Boolean);
+        let simulatorResults = {};
+        try{ simulatorResults = JSON.parse($('simulatorResults').value) } catch{ toast('Invalid JSON in simulator results'); return }
+
+        const res = await fetch(`${BASE_URL}/scenarios/submit-result`, {
+          method:'POST', headers: headers(), body: JSON.stringify({
+            scenarioId: $('scenarioId').value, simulatorResults, learningOutcomes
+          })
+        });
+        const data = await res.json();
+        renderFeedbackOnly(data); // show ONLY feedback
+        toast('Results submitted — feedback updated');
+        getMyScenarios();
+      }catch(e){ $('aiFeedback').innerHTML = `<div class="empty muted">Failed to submit: ${escapeHTML(e.message)}</div>` }
+    }
+
+    function prefillSample(){
+      $('scenarioId').value='';
+      $('learningOutcomes').value='Understood propellant efficiency, Learned environmental impact';
+      $('simulatorResults').value='{"emissionSaved":"15%","fuelEfficiency":"Improved","environmentalImpact":"Reduced","missionSuccess":true}';
+      toast('Sample filled');
+    }
+
+    /* -------- Boot -------- */
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const saved = localStorage.getItem('ai_user_id'); if(saved) $('userId').value = saved;
+      $('userId').addEventListener('change', e=> localStorage.setItem('ai_user_id', e.target.value));
+      pingBackend();
+      getMyScenarios();
+    });
+  </script>
+</body>
+</html>

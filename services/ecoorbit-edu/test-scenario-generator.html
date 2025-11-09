@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Space Scenario Generator — Pro</title>
+  <style>
+    :root{
+      --bg:#0e1624;--panel:#12243d;--panel-2:#1a2f50;--panel-3:#0f1e36;--text:#eaf2ff;--muted:#9db2d7;
+      --accent:#00c2ff;--accent-2:#7cf5ff;--warn:#ffcc66;--danger:#ff7a7a;--ok:#6ce38a;--border:#25446e;
+      --shadow:0 10px 30px rgba(0,0,0,.35)
+    }
+    *{box-sizing:border-box}
+    body{font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:linear-gradient(180deg,#0b1321, var(--bg)); color:var(--text); margin:0;}
+    .wrap{max-width:1200px;margin:0 auto;padding:28px}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+    header h1{margin:0;font-size:28px}
+    header .sub{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+    .panel{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:18px; box-shadow:var(--shadow)}
+    .panel h2{margin:0 0 10px;font-size:18px}
+    .section{background:var(--panel-3); border:1px solid var(--border); border-radius:12px; padding:16px; margin:12px 0}
+    label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px}
+    input,select,textarea,button{width:100%; padding:12px 12px; border-radius:10px; border:1px solid var(--border); background:var(--panel-2); color:var(--text)}
+    select{cursor:pointer}
+    textarea{min-height:110px; white-space:pre}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .btn{background:linear-gradient(180deg,var(--accent),#1397be); border:none; cursor:pointer; font-weight:700; letter-spacing:.2px}
+    .btn:hover{filter:brightness(1.07)}
+    .btn.secondary{background:transparent; border:1px solid var(--border)}
+    .btn.warn{background:linear-gradient(180deg,var(--warn),#ffb84a); color:#111}
+    .btn.ok{background:linear-gradient(180deg,var(--ok),#41c772); color:#102114}
+    .kpi{display:flex; gap:14px; flex-wrap:wrap}
+    .chip{padding:6px 10px; border-radius:999px; background:var(--panel-2); border:1px solid var(--border); font-size:12px; color:var(--muted)}
+    .response{background:#0c1730; border:1px dashed var(--border); border-radius:12px; padding:12px; max-height:380px; overflow:auto; font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px}
+    .card{background:var(--panel-2); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:12px; padding:12px; margin:10px 0}
+    .title-row{display:flex; align-items:center; justify-content:space-between; gap:12px}
+    .badge{background:var(--warn); color:#111; font-weight:700; border-radius:999px; padding:4px 10px; font-size:11px}
+    .toolbar{display:flex; gap:10px; align-items:center; justify-content:flex-end; margin-top:10px}
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+    .hidden{display:none}
+    .toast{position:fixed; right:20px; bottom:20px; background:#102038; border:1px solid var(--border); box-shadow:var(--shadow); color:var(--text); padding:12px 14px; border-radius:10px; opacity:0; transform:translateY(10px); transition:all .25s}
+    .toast.show{opacity:1; transform:translateY(0)}
+    .hr{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent); margin:14px 0}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div style="font-size:24px">🚀</div>
+      <div>
+        <h1>AI Space Scenario Generator</h1>
+        <div class="sub">Ontario curriculum-aligned missions with Gemini fallback</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: Builder -->
+      <section class="panel">
+        <h2>🎯 Build Mission</h2>
+        <div class="kpi">
+          <div class="chip">Backend: <span id="kpi-backend" class="muted">checking…</span></div>
+          <div class="chip">Gemini key: <span id="kpi-gemini" class="muted">checking…</span></div>
+        </div>
+
+        <div class="section">
+          <div class="row">
+            <div>
+              <label>User ID</label>
+              <input id="userId" placeholder="User ID" value="67a1b2c3d4e5f67890123457" />
+            </div>
+            <div>
+              <label>Grade (6–12)</label>
+              <input id="gradeLevel" type="number" min="6" max="12" value="6" />
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label>Curriculum Code</label>
+              <select id="curriculumCode">
+                <option value="E2.2">Grade 6 — Rocket Propulsion (E2.2)</option>
+                <option value="E2.1">Grade 6 — Solar System (E2.1)</option>
+                <option value="E1.1">Grade 6 — Space Exploration Impact (E1.1)</option>
+                <option value="C1.1">Grade 7 — Heat Transfer (C1.1)</option>
+                <option value="D2.3">Grade 8 — Fluid Dynamics (D2.3)</option>
+                <option value="Z12.1">Grade 12 — Advanced Space Systems (Z12.1)</option>
+              </select>
+            </div>
+            <div>
+              <label>Custom Topic (optional)</label>
+              <input id="customTopic" placeholder="e.g., Water vs Nitrogen in Rockets" value="Water vs Nitrogen in Rockets" />
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <button id="btn-generate" class="btn" onclick="generateScenario()">🎮 Generate AI Space Mission</button>
+            </div>
+            <div>
+              <button class="btn secondary" onclick="getMyScenarios()">🔄 Refresh My Scenarios</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="title-row">
+            <h3 style="margin:0">Response</h3>
+            <div class="toolbar">
+              <button class="btn secondary small" onclick="copyBlock('generateResponse')">📋 Copy JSON</button>
+              <button class="btn secondary small" onclick="clearBlock('generateResponse')">🧹 Clear</button>
+            </div>
+          </div>
+          <pre id="generateResponse" class="response" aria-live="polite"></pre>
+        </div>
+
+        <div class="section">
+          <div class="row">
+            <div>
+              <label>Scenario ID</label>
+              <input id="scenarioId" placeholder="Scenario ID" />
+            </div>
+            <div>
+              <label>Learning Outcomes (comma separated)</label>
+              <input id="learningOutcomes" value="Understood propellant efficiency, Learned environmental impact" />
+            </div>
+          </div>
+          <label>Simulator Results (JSON)</label>
+          <textarea id="simulatorResults">{
+  "emissionSaved": "15%",
+  "fuelEfficiency": "Improved",
+  "environmentalImpact": "Reduced",
+  "missionSuccess": true
+}</textarea>
+          <div class="row">
+            <button class="btn ok" onclick="submitScenarioResults()">📨 Submit Results & Get AI Feedback</button>
+            <button class="btn secondary" onclick="prefillSample()">✨ Prefill Sample</button>
+          </div>
+          <pre id="submitResponse" class="response"></pre>
+        </div>
+      </section>
+
+      <!-- RIGHT: Library / Samples -->
+      <aside class="panel">
+        <h2>📚 My Scenarios</h2>
+        <div id="scenariosList" class="response">Loading…</div>
+        <div class="hr"></div>
+        <h2>🎪 Sample Missions</h2>
+        <div id="samples"></div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const BASE_URL = 'http://localhost:4010/api/edu';
+
+    // ————— Utils —————
+    const $ = (id) => document.getElementById(id);
+
+    function toast(msg){
+      const t = $('toast');
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'), 1800);
+    }
+
+    function copyBlock(id){
+      const el = $(id); if(!el) return; navigator.clipboard.writeText(el.textContent||''); toast('Copied');
+    }
+    function clearBlock(id){ const el=$(id); if(el) el.textContent=''; }
+
+    function headers(){ return { 'Content-Type':'application/json', 'x-debug-user-id': $('userId').value } }
+
+    function setBusy(btnId, busy){ const b=$(btnId); if(!b) return; b.disabled=busy; b.textContent=busy?'⏳ Working…':'🎮 Generate AI Space Mission'; }
+
+    function toList(val){ return Array.isArray(val)?val: (val? [val]: []);}    
+
+    function renderSamples(){
+      const samples = [
+        {title:'🚀 Water vs Nitrogen Propellant Test', grade:6, code:'E2.2', topic:'rocket_propulsion', mission:'Compare nitrogen vs water as propellant'},
+        {title:'🛰️ Solar System Explorer', grade:6, code:'E2.1', topic:'solar_system', mission:'Map planets & orbits'},
+        {title:'🌍 Space Environmental Impact', grade:9, code:'A1.2', topic:'environmental_impact', mission:'Analyze emissions & debris'},
+        {title:'🧪 Advanced Space Systems', grade:12, code:'Z12.1', topic:'advanced_space_systems', mission:'Design sustainable deep-space mission'}
+      ];
+      const root = $('samples'); root.innerHTML = samples.map(cardHTML).join('');
+    }
+    function cardHTML(s){
+      return `<div class="card">
+        <div class="title-row">
+          <div><strong>${s.title}</strong> <span class="badge">Grade ${s.grade}</span></div>
+        </div>
+        <div class="muted small" style="margin:6px 0 10px">Curriculum: ${s.code}</div>
+        <div class="small">Mission: ${s.mission}</div>
+        <div class="toolbar">
+          <button class="btn secondary small" onclick="loadSample(${s.grade}, '${s.code}', '${s.topic}')">Load</button>
+          <button class="btn secondary small" onclick="generateFromSample(${s.grade}, '${s.code}', '${s.topic}')">Generate</button>
+        </div>
+      </div>`
+    }
+
+    async function pingBackend(){
+      try {
+        const res = await fetch('http://localhost:4010/health');
+        $('kpi-backend').textContent = res.ok? 'online' : 'offline';
+      } catch { $('kpi-backend').textContent='offline'; }
+
+      try {
+        const res = await fetch('http://localhost:4010/api/debug-env');
+        const d = await res.json();
+        $('kpi-gemini').textContent = d?.hfKeyExists === true || d?.geminiKeyExists === true ? 'available' : 'missing';
+      } catch { $('kpi-gemini').textContent='unknown'; }
+    }
+
+    // ————— API flows —————
+    async function generateScenario(){
+      setBusy('btn-generate', true);
+      try {
+        const grade = parseInt($('gradeLevel').value, 10);
+        if (!Number.isInteger(grade) || grade < 6 || grade > 12) throw new Error('Grade must be 6–12');
+
+        const payload = {
+          grade,
+          curriculumCode: $('curriculumCode').value,
+          topic: $('customTopic').value || undefined
+        };
+
+        const res = await fetch(`${BASE_URL}/scenarios/generate`, {
+          method:'POST', headers: headers(), body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        $('generateResponse').textContent = JSON.stringify(data, null, 2);
+
+        const newId = data?.scenario?._id || data?._id; if(newId) $('scenarioId').value = newId;
+        toast('Generated'); getMyScenarios();
+      } catch(e){
+        $('generateResponse').textContent = JSON.stringify({error:'Failed to generate', details:e.message}, null, 2);
+      } finally { setBusy('btn-generate', false); }
+    }
+
+    async function getMyScenarios(){
+      const el = $('scenariosList'); el.textContent='Loading…';
+      try {
+        const res = await fetch(`${BASE_URL}/scenarios/my-scenarios`, { headers: headers() });
+        const data = await res.json();
+        if (!Array.isArray(data)) { el.textContent = 'Invalid response'; return; }
+        if (!data.length) { el.textContent = 'No scenarios yet'; return; }
+        el.textContent = data.map(s => `SCENARIO: ${s.title || 'Untitled'}\nGrade: ${s.grade ?? 'N/A'} | Curriculum: ${s.curriculumCode || 'N/A'}\nMission: ${s.mission || 'No mission'}\nStatus: ${s.status || 'unknown'}\nID: ${s._id || 'No ID'}\n—`).join('\n');
+      } catch(e){ el.textContent = 'Error: '+e.message; }
+    }
+
+    async function submitScenarioResults(){
+      try {
+        const learningOutcomes = $('learningOutcomes').value.split(',').map(s=>s.trim()).filter(Boolean);
+        let simulatorResults = {};
+        try { simulatorResults = JSON.parse($('simulatorResults').value); }
+        catch{ toast('Invalid JSON in simulator results'); return; }
+
+        const res = await fetch(`${BASE_URL}/scenarios/submit-result`, {
+          method:'POST', headers: headers(),
+          body: JSON.stringify({
+            scenarioId: $('scenarioId').value,
+            simulatorResults, learningOutcomes
+          })
+        });
+        const data = await res.json();
+        $('submitResponse').textContent = JSON.stringify(data, null, 2);
+        toast('Submitted'); getMyScenarios();
+      } catch(e){
+        $('submitResponse').textContent = JSON.stringify({error:'Failed to submit', details:e.message}, null, 2);
+      }
+    }
+
+    function prefillSample(){
+      $('scenarioId').value = '';
+      $('learningOutcomes').value = 'Understood propellant efficiency, Learned environmental impact';
+      $('simulatorResults').value = '{\n  "emissionSaved": "15%",\n  "fuelEfficiency": "Improved",\n  "environmentalImpact": "Reduced",\n  "missionSuccess": true\n}';
+      toast('Sample filled');
+    }
+
+    function loadSample(grade, code, topic){
+      $('gradeLevel').value = grade; $('curriculumCode').value = code; $('customTopic').value = topic; toast('Sample loaded');
+    }
+
+    function generateFromSample(grade, code, topic){
+      loadSample(grade, code, topic); generateScenario();
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      // restore user id
+      const saved = localStorage.getItem('ai_user_id');
+      if (saved) $('userId').value = saved;
+      $('userId').addEventListener('change', e=> localStorage.setItem('ai_user_id', e.target.value));
+
+      renderSamples();
+      getMyScenarios();
+      pingBackend();
+    });
+  </script>
+</body>
+</html>

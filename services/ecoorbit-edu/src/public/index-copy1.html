@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoOrbit EDU • Learning Platform</title>
+  <style>
+    :root {
+      --primary: #0B3D91;
+      --primary-dark: #082a6b;
+      --secondary: #4CAF50;
+      --accent: #E27D60;
+      --warning: #FF9800;
+      --danger: #ef4444;
+      --success: #10b981;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --muted: #64748b;
+      --border: #cbd5e1;
+      --radius: 12px;
+      --shadow: 0 10px 25px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: var(--dark);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 3rem;
+    }
+
+    .logo-icon {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-text h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .logo-text span {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .nav-section {
+      margin-bottom: 2rem;
+    }
+
+    .nav-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      color: var(--dark);
+      transition: var(--transition);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .nav-item i {
+      font-size: 1.2rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .page-title h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-title p {
+      color: rgba(255,255,255,0.8);
+      font-size: 1.1rem;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(255,255,255,0.95);
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .user-avatar {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: white;
+      font-weight: 600;
+    }
+
+    .user-info h3 {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .user-info p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Cards */
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-header h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* Progress */
+    .progress-section {
+      margin-bottom: 2rem;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    /* Mission List */
+    .mission-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      transition: var(--transition);
+    }
+
+    .mission-item:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .mission-icon {
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--light);
+      border-radius: 8px;
+    }
+
+    .mission-info {
+      flex: 1;
+    }
+
+    .mission-info h4 {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .mission-info p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .mission-status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .status-complete {
+      background: var(--success);
+      color: white;
+    }
+
+    .status-progress {
+      background: var(--warning);
+      color: white;
+    }
+
+    .status-pending {
+      background: var(--muted);
+      color: white;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.1);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: var(--light);
+      color: var(--dark);
+      border: 1px solid var(--border);
+    }
+
+    /* Badges */
+    .badges-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+    }
+
+    .badge {
+      text-align: center;
+      padding: 1rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      transition: var(--transition);
+    }
+
+    .badge.earned {
+      border-color: var(--success);
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .badge-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .badge-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    /* Loading States */
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .loading::after {
+      content: "Loading...";
+      display: block;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--dark);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .app-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .sidebar {
+        display: none;
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Section Management */
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">👨‍🚀</div>
+        <div class="logo-text">
+          <h1>EcoOrbit EDU</h1>
+          <span>Space Sustainability</span>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Learning</div>
+        <a class="nav-item active" onclick="showSection('dashboard')">
+          <i>📊</i> Dashboard
+        </a>
+        <a class="nav-item" onclick="showSection('missions')">
+          <i>🚀</i> Missions
+        </a>
+        <a class="nav-item" onclick="showSection('classes')">
+          <i>👨‍🏫</i> My Classes
+        </a>
+        <a class="nav-item" onclick="showSection('assignments')">
+          <i>📝</i> Assignments
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Progress</div>
+        <a class="nav-item" onclick="showSection('progress')">
+          <i>📈</i> Learning Progress
+        </a>
+        <a class="nav-item" onclick="showSection('badges')">
+          <i>🏆</i> Badges & Awards
+        </a>
+        <a class="nav-item" onclick="showSection('scenarios')">
+          <i>🛰️</i> Space Scenarios
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Account</div>
+        <a href="http://localhost:4000" class="nav-item">
+          <i>🏠</i> Main Portal
+        </a>
+        <a class="nav-item" onclick="showSection('profile')">
+          <i>👤</i> My Profile
+        </a>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <div class="header">
+        <div class="page-title">
+          <h1 id="pageTitle">Learning Dashboard</h1>
+          <p id="pageSubtitle">Welcome to your space sustainability journey</p>
+        </div>
+        <div class="user-profile">
+          <div class="user-avatar" id="userAvatar">SE</div>
+          <div class="user-info">
+            <h3 id="userName">Space Explorer</h3>
+            <p id="userRole">Student • Level 3</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="section active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🚀</div>
+            <div class="stat-number" id="missionsCount">0</div>
+            <div class="stat-label">Missions Completed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-number" id="badgesCount">0</div>
+            <div class="stat-label">Badges Earned</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-number" id="learningHours">0</div>
+            <div class="stat-label">Learning Hours</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📈</div>
+            <div class="stat-number" id="successRate">0%</div>
+            <div class="stat-label">Success Rate</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="card">
+            <div class="card-header">
+              <h2>Current Progress</h2>
+            </div>
+            <div class="card-body">
+              <div class="progress-section">
+                <h3>Space Sustainability Mastery</h3>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="mainProgress" style="width: 0%"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span id="levelText">Level 1 Novice</span>
+                  <span id="xpText">0/1000 XP</span>
+                </div>
+              </div>
+              
+              <h4 style="margin: 1.5rem 0 1rem 0;">Active Missions</h4>
+              <div id="activeMissionsList">
+                <div class="mission-item">
+                  <div class="mission-icon">⏳</div>
+                  <div class="mission-info">
+                    <h4>No active missions</h4>
+                    <p>Start your first mission to begin learning</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Recent Activity</h2>
+              <button class="btn btn-secondary" onclick="loadRecentActivity()">Refresh</button>
+            </div>
+            <div class="card-body" id="recentActivity">
+              <div class="mission-item">
+                <div class="mission-icon">📚</div>
+                <div class="mission-info">
+                  <h4>Welcome to EcoOrbit EDU!</h4>
+                  <p>Get started by creating your first mission</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Missions Section -->
+      <section id="missions" class="section">
+        <div class="dashboard-grid">
+          <div class="card">
+            <div class="card-header">
+              <h2>Mission Builder</h2>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">User ID</label>
+                <input type="text" class="form-control" id="userId" value="67a1b2c3d4e5f67890123457">
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label">Grade Level</label>
+                  <input type="number" class="form-control" id="gradeLevel" min="6" max="12" value="6">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Curriculum Code</label>
+                  <select class="form-control" id="curriculumCode">
+                    <option value="E2.2">Grade 6 — Rocket Propulsion</option>
+                    <option value="E2.1">Grade 6 — Solar System</option>
+                    <option value="E1.1">Grade 6 — Space Exploration Impact</option>
+                    <option value="C1.1">Grade 7 — Heat Transfer</option>
+                    <option value="D2.3">Grade 8 — Fluid Dynamics</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Custom Topic</label>
+                <input type="text" class="form-control" id="customTopic" placeholder="e.g., Water vs Nitrogen in Rockets">
+              </div>
+              
+              <button class="btn btn-primary" onclick="generateScenario()">
+                🚀 Generate Mission
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Generated Mission</h2>
+            </div>
+            <div class="card-body" id="missionOutput">
+              <div style="text-align: center; color: var(--muted); padding: 2rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🛰️</div>
+                <h3>No Mission Generated</h3>
+                <p>Create a mission using the builder to see details here</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>My Missions</h2>
+            <button class="btn btn-secondary" onclick="loadMyMissions()">Refresh</button>
+          </div>
+          <div class="card-body" id="myMissionsList">
+            <div style="text-align: center; color: var(--muted); padding: 2rem;">
+              <p>No missions yet. Generate your first mission!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Classes Section -->
+      <section id="classes" class="section">
+        <div class="dashboard-grid">
+          <div class="card">
+            <div class="card-header">
+              <h2>My Classes</h2>
+              <button class="btn btn-primary" onclick="showCreateClassModal()">Create Class</button>
+            </div>
+            <div class="card-body" id="classesList">
+              <div style="text-align: center; color: var(--muted); padding: 2rem;">
+                <p>No classes yet. Create your first class!</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Join a Class</h2>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Class Join Code</label>
+                <input type="text" class="form-control" id="joinCode" placeholder="Enter class code">
+              </div>
+              <button class="btn btn-primary" onclick="joinClass()">Join Class</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Assignments Section -->
+      <section id="assignments" class="section">
+        <div class="card">
+          <div class="card-header">
+            <h2>My Assignments</h2>
+            <button class="btn btn-secondary" onclick="loadAssignments()">Refresh</button>
+          </div>
+          <div class="card-body" id="assignmentsList">
+            <div style="text-align: center; color: var(--muted); padding: 2rem;">
+              <p>No assignments yet. Check back later!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Progress Section -->
+      <section id="progress" class="section">
+        <div class="card">
+          <div class="card-header">
+            <h2>Learning Progress</h2>
+          </div>
+          <div class="card-body">
+            <div class="progress-section">
+              <h3>Overall Progress</h3>
+              <div class="progress-bar">
+                <div class="progress-fill" id="overallProgress" style="width: 0%"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span id="overallLevel">Level 1</span>
+                <span id="overallXP">0 XP</span>
+              </div>
+            </div>
+
+            <h4 style="margin: 2rem 0 1rem 0;">Skill Breakdown</h4>
+            <div id="skillsProgress">
+              <!-- Skills will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Badges Section -->
+      <section id="badges" class="section">
+        <div class="card">
+          <div class="card-header">
+            <h2>My Badges</h2>
+          </div>
+          <div class="card-body">
+            <div class="badges-grid" id="badgesList">
+              <!-- Badges will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Profile Section -->
+      <section id="profile" class="section">
+        <div class="card">
+          <div class="card-header">
+            <h2>My Profile</h2>
+          </div>
+          <div class="card-body">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+              <div>
+                <h3 style="margin-bottom: 1rem;">Personal Information</h3>
+                <div class="form-group">
+                  <label class="form-label">Display Name</label>
+                  <input type="text" class="form-control" id="displayName" value="Space Explorer">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="userEmail" value="student@ecoorbit.com">
+                </div>
+                <button class="btn btn-primary" onclick="updateProfile()">Update Profile</button>
+              </div>
+              <div>
+                <h3 style="margin-bottom: 1rem;">Account Stats</h3>
+                <div style="background: var(--light); padding: 1.5rem; border-radius: var(--radius);">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Member Since:</span>
+                    <strong id="memberSince">Today</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Total Missions:</span>
+                    <strong id="totalMissions">0</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Average Score:</span>
+                    <strong id="averageScore">0%</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const BASE_URL = 'http://localhost:4010/api/edu';
+
+    // Utility Functions
+    function $(id) { return document.getElementById(id); }
+    function showToast(message, type = 'info') {
+      const toast = $('toast');
+      toast.textContent = message;
+      toast.className = `toast show`;
+      setTimeout(() => toast.className = 'toast', 3000);
+    }
+
+    function getHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'x-debug-user-id': $('userId').value
+      };
+    }
+
+    // Section Management
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
+      $(sectionId).classList.add('active');
+      event.target.classList.add('active');
+      
+      updatePageTitle(sectionId);
+      loadSectionData(sectionId);
+    }
+
+    function updatePageTitle(sectionId) {
+      const titles = {
+        'dashboard': ['Learning Dashboard', 'Welcome to your space sustainability journey'],
+        'missions': ['Mission Builder', 'Create and manage space missions'],
+        'classes': ['My Classes', 'Manage your learning groups'],
+        'assignments': ['Assignments', 'View and submit assignments'],
+        'progress': ['Learning Progress', 'Track your educational journey'],
+        'badges': ['Badges & Awards', 'Your achievements and rewards'],
+        'scenarios': ['Space Scenarios', 'Interactive space simulations'],
+        'profile': ['My Profile', 'Manage your account settings']
+      };
+      
+      const [title, subtitle] = titles[sectionId] || titles.dashboard;
+      $('pageTitle').textContent = title;
+      $('pageSubtitle').textContent = subtitle;
+    }
+
+    function loadSectionData(sectionId) {
+      switch(sectionId) {
+        case 'dashboard': loadDashboardData(); break;
+        case 'missions': loadMyMissions(); break;
+        case 'classes': loadClasses(); break;
+        case 'assignments': loadAssignments(); break;
+        case 'progress': loadProgress(); break;
+        case 'badges': loadBadges(); break;
+        case 'scenarios': break; // Handled by form
+      }
+    }
+
+    // User Management
+    function loadUserData() {
+      const user = localStorage.getItem('user');
+      if (user) {
+        try {
+          const userData = JSON.parse(user);
+          $('userName').textContent = userData.name || 'Space Explorer';
+          $('userRole').textContent = (userData.role || 'Student') + ' • Level 3';
+          $('userAvatar').textContent = (userData.name || 'SE').substring(0, 2).toUpperCase();
+          $('displayName').value = userData.name || 'Space Explorer';
+        } catch (error) {
+          console.error('Error loading user data:', error);
+        }
+      }
+    }
+
+    function updateProfile() {
+      showToast('Profile updated successfully!');
+    }
+
+    // Dashboard Functions
+    async function loadDashboardData() {
+      try {
+        // Load missions count
+        const missionsRes = await fetch(`${BASE_URL}/scenarios/my-scenarios`, { headers: getHeaders() });
+        const missions = await missionsRes.json();
+        const completedMissions = Array.isArray(missions) ? missions.filter(m => m.status === 'completed').length : 0;
+        
+        $('missionsCount').textContent = completedMissions;
+        $('totalMissions').textContent = Array.isArray(missions) ? missions.length : 0;
+        
+        // Calculate progress
+        const totalXP = completedMissions * 100;
+        const progress = Math.min((totalXP / 1000) * 100, 100);
+        const level = Math.floor(totalXP / 250) + 1;
+        
+        $('mainProgress').style.width = `${progress}%`;
+        $('overallProgress').style.width = `${progress}%`;
+        $('levelText').textContent = `Level ${level} ${getLevelTitle(level)}`;
+        $('overallLevel').textContent = `Level ${level}`;
+        $('xpText').textContent = `${totalXP}/1000 XP`;
+        $('overallXP').textContent = `${totalXP} XP`;
+        
+        // Update stats
+        $('badgesCount').textContent = Math.floor(completedMissions / 2);
+        $('learningHours').textContent = completedMissions * 2;
+        $('successRate').textContent = completedMissions > 0 ? '87%' : '0%';
+        $('averageScore').textContent = completedMissions > 0 ? '87%' : '0%';
+        
+        // Load active missions
+        loadActiveMissions(missions);
+        
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      }
+    }
+
+    function getLevelTitle(level) {
+      const titles = ['Novice', 'Explorer', 'Specialist', 'Expert', 'Master'];
+      return titles[level - 1] || 'Legend';
+    }
+
+    function loadActiveMissions(missions) {
+      const container = $('activeMissionsList');
+      if (!Array.isArray(missions) || missions.length === 0) {
+        container.innerHTML = `
+          <div class="mission-item">
+            <div class="mission-icon">⏳</div>
+            <div class="mission-info">
+              <h4>No active missions</h4>
+              <p>Start your first mission to begin learning</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const activeMissions = missions.filter(m => m.status === 'in-progress').slice(0, 3);
+      if (activeMissions.length === 0) {
+        container.innerHTML = `
+          <div class="mission-item">
+            <div class="mission-icon">🎯</div>
+            <div class="mission-info">
+              <h4>All missions completed!</h4>
+              <p>Great job! Create new missions to continue learning</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = activeMissions.map(mission => `
+        <div class="mission-item">
+          <div class="mission-icon">🚀</div>
+          <div class="mission-info">
+            <h4>${mission.title || 'Untitled Mission'}</h4>
+            <p>${mission.curriculumCode || 'General'} • Grade ${mission.grade || 'N/A'}</p>
+          </div>
+          <div class="mission-status status-progress">In Progress</div>
+        </div>
+      `).join('');
+    }
+
+    function loadRecentActivity() {
+      showToast('Recent activity refreshed!');
+      // In a real app, this would fetch from an activity endpoint
+    }
+
+    // Missions Functions
+    async function generateScenario() {
+      const btn = event.target;
+      btn.classList.add('loading');
+      
+      try {
+        const payload = {
+          grade: parseInt($('gradeLevel').value),
+          curriculumCode: $('curriculumCode').value,
+          topic: $('customTopic').value || undefined
+        };
+
+        const res = await fetch(`${BASE_URL}/scenarios/generate`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        
+        // Display the generated mission
+        $('missionOutput').innerHTML = `
+          <div style="background: var(--light); padding: 1.5rem; border-radius: var(--radius);">
+            <h3 style="color: var(--primary); margin-bottom: 1rem;">${data.scenario?.title || 'New Mission'}</h3>
+            <p><strong>Grade:</strong> ${data.scenario?.grade || payload.grade}</p>
+            <p><strong>Curriculum:</strong> ${data.scenario?.curriculumCode || payload.curriculumCode}</p>
+            <p><strong>Topic:</strong> ${data.scenario?.topic || payload.topic}</p>
+            <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: var(--radius);">
+              <p>${data.scenario?.mission || 'Mission details will appear here...'}</p>
+            </div>
+          </div>
+        `;
+
+        showToast('Mission generated successfully!');
+        loadMyMissions(); // Refresh the missions list
+        
+      } catch (error) {
+        showToast('Error generating mission: ' + error.message, 'error');
+      } finally {
+        btn.classList.remove('loading');
+      }
+    }
+
+    async function loadMyMissions() {
+      try {
+        const res = await fetch(`${BASE_URL}/scenarios/my-scenarios`, { headers: getHeaders() });
+        const missions = await res.json();
+        
+        const container = $('myMissionsList');
+        if (!Array.isArray(missions) || missions.length === 0) {
+          container.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 2rem;"><p>No missions yet. Generate your first mission!</p></div>';
+          return;
+        }
+
+        container.innerHTML = missions.map(mission => `
+          <div class="mission-item">
+            <div class="mission-icon">🛰️</div>
+            <div class="mission-info">
+              <h4>${mission.title || 'Untitled Mission'}</h4>
+              <p>${mission.curriculumCode || 'General'} • Grade ${mission.grade || 'N/A'}</p>
+              <small>Created: ${new Date(mission.createdAt || Date.now()).toLocaleDateString()}</small>
+            </div>
+            <div class="mission-status ${mission.status === 'completed' ? 'status-complete' : mission.status === 'in-progress' ? 'status-progress' : 'status-pending'}">
+              ${mission.status || 'New'}
+            </div>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        showToast('Error loading missions: ' + error.message, 'error');
+      }
+    }
+
+    // Classes Functions
+    async function loadClasses() {
+      try {
+        const res = await fetch(`${BASE_URL}/classes`, { headers: getHeaders() });
+        const classes = await res.json();
+        
+        const container = $('classesList');
+        if (!Array.isArray(classes) || classes.length === 0) {
+          container.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 2rem;"><p>No classes yet. Create or join a class!</p></div>';
+          return;
+        }
+
+        container.innerHTML = classes.map(cls => `
+          <div class="mission-item">
+            <div class="mission-icon">👨‍🏫</div>
+            <div class="mission-info">
+              <h4>${cls.name || 'Unnamed Class'}</h4>
+              <p>${cls.description || 'No description'}</p>
+              <small>Code: ${cls.joinCode || 'N/A'} • Students: ${cls.studentCount || 0}</small>
+            </div>
+            <button class="btn btn-secondary" onclick="viewClass('${cls._id}')">View</button>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        showToast('Error loading classes: ' + error.message, 'error');
+      }
+    }
+
+    async function joinClass() {
+      const joinCode = $('joinCode').value.trim();
+      if (!joinCode) {
+        showToast('Please enter a join code', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BASE_URL}/classes/join`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ joinCode })
+        });
+
+        if (res.ok) {
+          showToast('Successfully joined class!');
+          $('joinCode').value = '';
+          loadClasses();
+        } else {
+          throw new Error('Failed to join class');
+        }
+      } catch (error) {
+        showToast('Error joining class: ' + error.message, 'error');
+      }
+    }
+
+    function showCreateClassModal() {
+      const className = prompt('Enter class name:');
+      if (className) {
+        createClass(className);
+      }
+    }
+
+    async function createClass(name) {
+      try {
+        const res = await fetch(`${BASE_URL}/classes`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ name, description: 'New class' })
+        });
+
+        if (res.ok) {
+          showToast('Class created successfully!');
+          loadClasses();
+        }
+      } catch (error) {
+        showToast('Error creating class: ' + error.message, 'error');
+      }
+    }
+
+    function viewClass(classId) {
+      showToast(`Viewing class ${classId} - would navigate to class details in full implementation`);
+    }
+
+    // Assignments Functions
+    async function loadAssignments() {
+      try {
+        const classRes = await fetch(`${BASE_URL}/classes`, { headers: getHeaders() });
+        const classes = await classRes.json();
+        
+        let allAssignments = [];
+        
+        // For each class, load assignments
+        if (Array.isArray(classes)) {
+          for (const cls of classes.slice(0, 3)) { // Limit to first 3 classes for demo
+            try {
+              const assignRes = await fetch(`${BASE_URL}/classes/${cls._id}/assignments`, { headers: getHeaders() });
+              const assignments = await assignRes.json();
+              if (Array.isArray(assignments)) {
+                allAssignments = allAssignments.concat(assignments.map(a => ({ ...a, className: cls.name })));
+              }
+            } catch (e) {
+              console.error(`Error loading assignments for class ${cls._id}:`, e);
+            }
+          }
+        }
+
+        const container = $('assignmentsList');
+        if (allAssignments.length === 0) {
+          container.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 2rem;"><p>No assignments yet. Check back later!</p></div>';
+          return;
+        }
+
+        container.innerHTML = allAssignments.map(assignment => `
+          <div class="mission-item">
+            <div class="mission-icon">📝</div>
+            <div class="mission-info">
+              <h4>${assignment.title || 'Untitled Assignment'}</h4>
+              <p>${assignment.className || 'General'} • Due: ${assignment.dueDate || 'No due date'}</p>
+              <small>${assignment.description || 'No description available'}</small>
+            </div>
+            <div class="mission-status ${assignment.submitted ? 'status-complete' : 'status-pending'}">
+              ${assignment.submitted ? 'Submitted' : 'Pending'}
+            </div>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        showToast('Error loading assignments: ' + error.message, 'error');
+      }
+    }
+
+    // Progress Functions
+    async function loadProgress() {
+      try {
+        // Load progress data
+        const skills = [
+          { name: 'Rocket Science', progress: 75 },
+          { name: 'Orbital Mechanics', progress: 60 },
+          { name: 'Space Sustainability', progress: 45 },
+          { name: 'Planetary Science', progress: 30 }
+        ];
+
+        const container = $('skillsProgress');
+        container.innerHTML = skills.map(skill => `
+          <div style="margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <span>${skill.name}</span>
+              <span>${skill.progress}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${skill.progress}%"></div>
+            </div>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        showToast('Error loading progress: ' + error.message, 'error');
+      }
+    }
+
+    // Badges Functions
+    async function loadBadges() {
+      const badges = [
+        { icon: '🌱', name: 'Green Pioneer', earned: true },
+        { icon: '📊', name: 'Data Analyst', earned: true },
+        { icon: '🚀', name: 'Launch Expert', earned: true },
+        { icon: '🛰️', name: 'Orbit Master', earned: false },
+        { icon: '🌕', name: 'Planetary Explorer', earned: false },
+        { icon: '🏆', name: 'Space Hero', earned: false }
+      ];
+
+      const container = $('badgesList');
+      container.innerHTML = badges.map(badge => `
+        <div class="badge ${badge.earned ? 'earned' : ''}">
+          <div class="badge-icon">${badge.icon}</div>
+          <div class="badge-name">${badge.name}</div>
+        </div>
+      `).join('');
+    }
+
+    // Scenarios Functions
+    async function submitScenarioResults() {
+      try {
+        const payload = {
+          scenarioId: $('scenarioId').value,
+          learningOutcomes: $('learningOutcomes').value.split(',').map(s => s.trim()).filter(Boolean),
+          simulatorResults: JSON.parse($('simulatorResults').value || '{}')
+        };
+
+        const res = await fetch(`${BASE_URL}/scenarios/submit-result`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        
+        // Display AI feedback
+        $('aiFeedback').innerHTML = `
+          <div style="background: var(--light); padding: 1.5rem; border-radius: var(--radius);">
+            <h4 style="color: var(--primary); margin-bottom: 1rem;">AI Feedback</h4>
+            <p>${data.feedback || 'Thank you for submitting your results! Your work shows great understanding of space sustainability concepts.'}</p>
+          </div>
+        `;
+
+        showToast('Results submitted successfully!');
+        
+      } catch (error) {
+        showToast('Error submitting results: ' + error.message, 'error');
+      }
+    }
+
+    // Initialize Application
+    document.addEventListener('DOMContentLoaded', function() {
+      loadUserData();
+      loadDashboardData();
+      loadBadges();
+      loadProgress();
+    });
+  </script>
+</body>
+</html>

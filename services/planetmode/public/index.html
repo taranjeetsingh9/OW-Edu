@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlanetMode Mission Control</title>
+  <style>
+    :root {
+      --bg: #0a0c11;
+      --panel: #151821;
+      --card: #171b24;
+      --text: #e8e8e8;
+      --accent: #0078ff;
+      --accent-light: #68b6ff;
+      --border: #1e1e1e;
+      --muted: #999;
+    }
+    body.light {
+      --bg: #f5f6fa;
+      --panel: #ffffff;
+      --card: #f0f2f8;
+      --text: #111;
+      --accent: #005fc4;
+      --accent-light: #0078ff;
+      --border: #dcdcdc;
+      --muted: #555;
+    }
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: all 0.3s ease;
+    }
+    header {
+      background: linear-gradient(90deg, var(--panel), var(--card));
+      color: var(--accent-light);
+      text-align: center;
+      padding: 20px 0 10px;
+      font-size: 1.6rem;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      letter-spacing: 1px;
+    }
+    #themeToggle {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: 0.3s;
+    }
+    #themeToggle:hover { background: var(--accent); color: #fff; }
+    #syncStatus {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 5px;
+      font-weight: 500;
+    }
+    main {
+      display: flex;
+      flex: 1;
+      gap: 20px;
+      padding: 20px;
+    }
+    .controls {
+      width: 280px;
+      background: var(--panel);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+      height: fit-content;
+    }
+    .controls h3 {
+      margin-top: 0;
+      color: var(--accent-light);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+    label { display: block; margin-top: 10px; font-weight: 500; }
+    select {
+      width: 100%;
+      padding: 6px 8px;
+      margin-top: 5px;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    button {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover { background: var(--accent-light); }
+    .dashboard {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 18px;
+      border-left: 4px solid var(--accent);
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    .mission {
+      background: var(--panel);
+      border-left: 4px solid var(--accent-light);
+      margin-bottom: 10px;
+      padding: 12px;
+      border-radius: 6px;
+    }
+    footer { text-align: center; padding: 15px; font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--border); }
+
+    /* Loader Overlay */
+    #loader {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      flex-direction: column;
+      backdrop-filter: blur(4px);
+    }
+    .spinner {
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top: 4px solid var(--accent-light);
+      border-radius: 50%;
+      width: 60px; height: 60px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* ---- Weather Table Fix ---- */
+    #cardWeather table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      table-layout: fixed;
+    }
+    #cardWeather th, #cardWeather td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      word-wrap: break-word;
+      white-space: normal;
+      vertical-align: top;
+    }
+    #cardWeather th {
+      color: var(--accent-light);
+      font-size: 0.95rem;
+      border-bottom: 2px solid var(--accent-light);
+    }
+    #cardWeather td {
+      color: var(--text);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+    #cardWeather tr td:first-child { font-weight: 600; }
+    #cardWeather td:last-child {
+      max-width: 200px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      display: inline-block;
+    }
+    .planet-icon {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .planet-earth { background: linear-gradient(45deg, #1e90ff, #00ff99); }
+    .planet-mars { background: linear-gradient(45deg, #ff4500, #d12f00); }
+    .planet-moon { background: linear-gradient(45deg, #aaa, #666); }
+
+    /* ---- NEO Table Styling ---- */
+    #cardNeo table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    #cardNeo th, #cardNeo td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+    #cardNeo th {
+      color: var(--accent-light);
+      font-weight: 600;
+      border-bottom: 2px solid var(--accent-light);
+    }
+    #cardNeo tr:hover { background: rgba(255,255,255,0.05); }
+  </style>
+</head>
+
+<body>
+  <header>
+    🚀 PlanetMode Mission Control Dashboard
+    <button id="themeToggle">🌙 Dark</button>
+    <div id="syncStatus">🛰 Awaiting first sync...</div>
+  </header>
+
+  <main>
+    <div class="controls">
+      <h3>Simulation Controls</h3>
+      <label>Planet</label>
+      <select id="planet"><option>Earth</option><option>Moon</option><option>Mars</option></select>
+      <label>Vehicle</label>
+      <select id="vehicle"><option>Apollo LM</option><option>Starship</option><option>Curiosity Rover</option></select>
+      <label>Landing Site (Earth only)</label>
+      <select id="site"><option>Timmins</option><option>Capio</option></select>
+      <button id="runSimulation">Run Full Simulation</button>
+    </div>
+
+    <div class="dashboard">
+      <div class="card" id="cardSim"><h3>Simulation Results</h3><div id="simResults">No data yet.</div></div>
+      <div class="card" id="cardWeather"><h3>Planetary Weather</h3><div id="weatherGrid">No data yet.</div></div>
+      <div class="card" id="cardNeo"><h3>Near-Earth Objects</h3><div id="neoData">No data yet.</div></div>
+      <div class="card" id="cardMission"><h3>Generated Missions <span id="missionCount">—</span></h3><div id="missionsList">No missions yet.</div></div>
+    </div>
+  </main>
+
+  <footer>© 2025 PlanetMode Systems | Gemini + NASA APIs</footer>
+
+  <div id="loader">
+    <div class="spinner"></div>
+    <div id="loaderText">Initializing mission...</div>
+  </div>
+
+  <script>
+    const runBtn = document.getElementById("runSimulation");
+    const simResults = document.getElementById("simResults");
+    const missionsList = document.getElementById("missionsList");
+    const missionCount = document.getElementById("missionCount");
+    const weatherGrid = document.getElementById("weatherGrid");
+    const neoData = document.getElementById("neoData");
+    const syncStatus = document.getElementById("syncStatus");
+    const loader = document.getElementById("loader");
+    const planetEl = document.getElementById("planet");
+    const vehicleEl = document.getElementById("vehicle");
+    const siteEl = document.getElementById("site");
+    const themeToggle = document.getElementById("themeToggle");
+
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("light");
+      themeToggle.textContent = document.body.classList.contains("light") ? "🌞 Light" : "🌙 Dark";
+    });
+
+    async function runFullSimulation() {
+      const planet = planetEl.value;
+      const vehicle = vehicleEl.value;
+      const site = siteEl.value;
+      loader.style.display = "flex";
+
+      try {
+        const res = await fetch("/planetmode/gemini-simulate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ planet, vehicle, site })
+        });
+        const data = await res.json();
+
+        const r = data.results || {};
+        simResults.innerHTML = `
+          <b>Planet:</b> ${planet}<br><b>Vehicle:</b> ${vehicle}<br><b>Site:</b> ${site}<hr>
+          Crater: ${r.craterDiameter || "N/A"}<br>
+          Dust: ${r.dustRadius || "N/A"}<br>
+          Seismic: ${r.seismicMagnitude || "N/A"}<br>
+          Contamination: ${r.contaminationLevel || "N/A"}<br>
+          Env. Score: ${r.environmentalScore || "N/A"}<hr>
+          <i>${data.summary || "No summary available."}</i>`;
+
+        const w = data.weather || {};
+        weatherGrid.innerHTML = `
+          <table>
+            <tr><th>Planet</th><th>Temperature</th><th>Humidity / Pressure</th><th>Condition / Summary</th></tr>
+            <tr><td><span class="planet-icon planet-earth"></span> Earth (${w.Earth?.city || site})</td>
+                <td>${w.Earth?.temp ?? "N/A"} °C</td>
+                <td>${w.Earth?.humidity ?? "—"}%</td>
+                <td>${w.Earth?.condition || "N/A"}</td></tr>
+            <tr><td><span class="planet-icon planet-mars"></span> Mars</td>
+                <td>${w.Mars?.tempAvg ?? "N/A"} °C</td>
+                <td>${w.Mars?.pressure ?? "—"} Pa</td>
+                <td>Wind: ${w.Mars?.wind ?? "N/A"}</td></tr>
+            <tr><td><span class="planet-icon planet-moon"></span> Moon</td>
+                <td>—</td><td>—</td>
+                <td>${w.Moon?.summary || "No atmosphere, extreme temperature fluctuations."}</td></tr>
+          </table>`;
+
+        // ---- NEO TABLE ----
+        const neo = data.neo || {};
+        if (neo.error) {
+          neoData.innerHTML = `<p>${neo.error}</p>`;
+        } else {
+          const c = neo.closest || {};
+          neoData.innerHTML = `
+            <table>
+              <tr><th>Metric</th><th>Value</th></tr>
+              <tr><td>Total Objects</td><td>${neo.totalObjects ?? "N/A"}</td></tr>
+              <tr><td>Hazardous Count</td><td>${neo.hazardousCount ?? "N/A"}</td></tr>
+              <tr><td>Closest Object</td><td>${c.name || "N/A"}</td></tr>
+              <tr><td>Miss Distance</td><td>${c.missDistance_km ? c.missDistance_km.toFixed(2) + " km" : "N/A"}</td></tr>
+              <tr><td>Velocity</td><td>${c.relativeVelocity_km_s ? c.relativeVelocity_km_s.toFixed(2) + " km/s" : "N/A"}</td></tr>
+              <tr><td>Orbiting Body</td><td>${c.orbitingBody || "N/A"}</td></tr>
+              <tr><td>Hazardous?</td><td>${c.isHazardous ? "⚠️ Yes" : "No"}</td></tr>
+            </table>`;
+        }
+
+        // ---- MISSIONS ----
+        const missionRes = await fetch(`/planetmode/gemini-missions?planet=${planet}&vehicle=${vehicle}&count=3`);
+        const mData = await missionRes.json();
+        const missions = mData.missions || [];
+        missionCount.textContent = `${missions.length} missions`;
+        missionsList.innerHTML = missions.map(m => `
+          <div class="mission">
+            <b>${m.missionName}</b> (${m.era}, ${m.status})<br>
+            ${m.scenario?.bodyId || ""} — ${m.scenario?.landingSite?.name || ""}<br>
+            Vehicle: ${m.scenario?.vehicle?.name || ""}<br><br>
+            Scientific: ${m.scoring?.scientificValue}%<br>
+            Safety: ${m.scoring?.safety}%<br>
+            Efficiency: ${m.scoring?.efficiency}%<br>
+            Overall: ${m.scoring?.overall}%
+          </div>`).join("");
+        syncStatus.textContent = "🛰 Synced — Gemini + NASA data loaded.";
+      } catch (err) {
+        simResults.innerHTML = `<p>❌ ${err.message}</p>`;
+      } finally {
+        loader.style.display = "none";
+      }
+    }
+
+    runBtn.addEventListener("click", runFullSimulation);
+  </script>
+</body>
+</html>
