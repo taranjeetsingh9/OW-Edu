@@ -216,6 +216,29 @@
             setupLogoutHandler();
         });
     
+        function navigateToService(serviceKey) {
+    switch (serviceKey) {
+        case "greenlaunch":
+            window.location.href = "http://localhost:4020";
+            break;
+
+        case "eco-edu":
+            window.location.href = "http://localhost:4010";
+            break;
+
+        case "orbitwatch":
+            window.location.href = "http://localhost:4030";
+            break;
+
+        case "planetmode":
+            window.location.href = "http://localhost:4040";
+            break;
+
+        default:
+            alert("Service not available.");
+    }
+}
+
         // Load user data from localStorage
         function loadUserData() {
             const user = localStorage.getItem('user');
@@ -241,6 +264,9 @@
             }
         }
     
+
+
+        
         // Setup click handlers for dashboard cards
         function setupCardClickHandlers() {
             const dashboardCards = document.querySelectorAll('.dashboard-card');
@@ -251,6 +277,8 @@
                 });
             });
         }
+
+    
     
         // Setup logout handler
         function setupLogoutHandler() {

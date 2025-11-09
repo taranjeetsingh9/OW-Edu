@@ -20,7 +20,7 @@ exports.getSimulationConfig = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("❌ Error in getSimulationConfig:", err);
+    console.error(" Error in getSimulationConfig:", err);
     res.status(500).json({ error: "Failed to load simulation config" });
   }
 };
@@ -40,20 +40,25 @@ exports.runSimulation = async (req, res) => {
 
     /* ---------- Gemini Simulation ---------- */
     const prompt = `
-Simulate a ${planet} landing using ${vehicle} at ${site}.
-Respond with JSON only:
-{
- "results": {
-   "craterDiameter": "10 m",
-   "dustRadius": "50 m",
-   "seismicMagnitude": "M 3.2",
-   "contaminationLevel": 2,
-   "environmentalScore": 92
- },
- "summary": "Short description",
- "risks": ["..."],
- "recommendations": ["..."]
-}`;
+    Respond ONLY with valid JSON, no explanation, no markdown, no extra text.
+    If you cannot produce JSON, return an empty JSON object {}.
+    
+    {
+     "results": {
+       "craterDiameter": "string",
+       "dustRadius": "string",
+       "seismicMagnitude": "string",
+       "contaminationLevel": number,
+       "environmentalScore": number
+     },
+     "summary": "short text",
+     "risks": ["text"],
+     "recommendations": ["text"]
+    }
+    
+    Simulate a ${planet} landing using ${vehicle} at ${site}.
+    Return ONLY the JSON above.
+    `;
     let aiData;
     try {
       aiData = await gemini.generateContent(prompt);
@@ -119,12 +124,30 @@ Respond with JSON only:
 
     /* ---------- Moon Weather (Fictional) ---------- */
     let moonWeather = { summary: "No atmosphere, extreme cold (-170°C at night)." };
+
     try {
-      const moonPrompt = `Generate a fictional short weather report for the Moon in JSON:
-{ "summary": "No atmosphere, extreme cold (-170°C at night)." }`;
+      const moonPrompt = `
+    Return ONLY valid JSON. No markdown. No explanation. No extra text.
+    
+    {
+      "summary": "No atmosphere, extreme cold (-170°C at night)."
+    }
+    
+    Generate a fictional short weather report for the Moon.
+    Replace the summary with a realistic variation.
+    Return ONLY the JSON object.
+    `;
+    
       const moonData = await gemini.generateContent(moonPrompt);
-      if (moonData.summary) moonWeather = moonData;
-    } catch {}
+    
+      // Accept JSON only
+      if (moonData && moonData.summary) {
+        moonWeather = moonData;
+      }
+    } catch (err) {
+      console.warn("Moon weather Gemini failed:", err.message);
+    }
+    
 
     /* ---------- NEO (Near-Earth Objects) ---------- */
     let neoSummary = null;
@@ -154,7 +177,7 @@ Respond with JSON only:
       neo: neoSummary,
     });
   } catch (err) {
-    console.error("❌ Simulation error:", err);
+    console.error("Simulation error:", err);
     res.status(500).json({ ok: false, error: err.message });
   }
 };

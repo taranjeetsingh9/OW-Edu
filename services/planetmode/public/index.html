@@ -4,223 +4,189 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PlanetMode Mission Control</title>
-  <style>
-    :root {
-      --bg: #0a0c11;
-      --panel: #151821;
-      --card: #171b24;
-      --text: #e8e8e8;
-      --accent: #0078ff;
-      --accent-light: #68b6ff;
-      --border: #1e1e1e;
-      --muted: #999;
-    }
-    body.light {
-      --bg: #f5f6fa;
-      --panel: #ffffff;
-      --card: #f0f2f8;
-      --text: #111;
-      --accent: #005fc4;
-      --accent-light: #0078ff;
-      --border: #dcdcdc;
-      --muted: #555;
-    }
-    body {
-      font-family: "Inter", sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      transition: all 0.3s ease;
-    }
-    header {
-      background: linear-gradient(90deg, var(--panel), var(--card));
-      color: var(--accent-light);
-      text-align: center;
-      padding: 20px 0 10px;
-      font-size: 1.6rem;
-      font-weight: 600;
-      border-bottom: 1px solid var(--border);
-      position: relative;
-      letter-spacing: 1px;
-    }
-    #themeToggle {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 6px 12px;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 0.9rem;
-      transition: 0.3s;
-    }
-    #themeToggle:hover { background: var(--accent); color: #fff; }
-    #syncStatus {
-      font-size: 0.9rem;
-      color: var(--muted);
-      margin-top: 5px;
-      font-weight: 500;
-    }
-    main {
-      display: flex;
-      flex: 1;
-      gap: 20px;
-      padding: 20px;
-    }
-    .controls {
-      width: 280px;
-      background: var(--panel);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
-      height: fit-content;
-    }
-    .controls h3 {
-      margin-top: 0;
-      color: var(--accent-light);
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 6px;
-    }
-    label { display: block; margin-top: 10px; font-weight: 500; }
-    select {
-      width: 100%;
-      padding: 6px 8px;
-      margin-top: 5px;
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-    }
-    button {
-      background: var(--accent);
-      border: none;
-      color: #fff;
-      font-weight: 600;
-      padding: 10px 14px;
-      border-radius: 6px;
-      margin-top: 20px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover { background: var(--accent-light); }
-    .dashboard {
-      flex: 1;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 20px;
-    }
-    .card {
-      background: var(--card);
-      border-radius: 10px;
-      padding: 18px;
-      border-left: 4px solid var(--accent);
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
-    .mission {
-      background: var(--panel);
-      border-left: 4px solid var(--accent-light);
-      margin-bottom: 10px;
-      padding: 12px;
-      border-radius: 6px;
-    }
-    footer { text-align: center; padding: 15px; font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--border); }
+<style>
+:root {
+  --bg: #0d1117;
+  --panel: #161b22;
+  --card: #1b1f27;
+  --text: #e6e9ef;
+  --accent: #2698ff;      /* Primary blue */
+  --accent-light: #5ab3ff;
+  --border: #2a2f36;
+  --muted: #aeb7c4;
+}
 
-    /* Loader Overlay */
-    #loader {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.8);
-      color: white;
-      font-size: 1.2rem;
-      font-weight: 600;
-      text-align: center;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      flex-direction: column;
-      backdrop-filter: blur(4px);
-    }
-    .spinner {
-      border: 4px solid rgba(255,255,255,0.2);
-      border-top: 4px solid var(--accent-light);
-      border-radius: 50%;
-      width: 60px; height: 60px;
-      animation: spin 1s linear infinite;
-      margin-bottom: 12px;
-    }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--bg);
+  margin: 0;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-    /* ---- Weather Table Fix ---- */
-    #cardWeather table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      table-layout: fixed;
-    }
-    #cardWeather th, #cardWeather td {
-      border-bottom: 1px solid var(--border);
-      padding: 8px 10px;
-      text-align: left;
-      word-wrap: break-word;
-      white-space: normal;
-      vertical-align: top;
-    }
-    #cardWeather th {
-      color: var(--accent-light);
-      font-size: 0.95rem;
-      border-bottom: 2px solid var(--accent-light);
-    }
-    #cardWeather td {
-      color: var(--text);
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-    #cardWeather tr td:first-child { font-weight: 600; }
-    #cardWeather td:last-child {
-      max-width: 200px;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      display: inline-block;
-    }
-    .planet-icon {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      margin-right: 6px;
-      vertical-align: middle;
-    }
-    .planet-earth { background: linear-gradient(45deg, #1e90ff, #00ff99); }
-    .planet-mars { background: linear-gradient(45deg, #ff4500, #d12f00); }
-    .planet-moon { background: linear-gradient(45deg, #aaa, #666); }
+/* ===== Header ===== */
+header {
+  background: var(--panel);
+  padding: 22px 0 12px;
+  text-align: center;
+  font-size: 1.7rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.5px;
+}
+#syncStatus {
+  font-size: 0.88rem;
+  margin-top: 4px;
+  color: var(--muted);
+}
 
-    /* ---- NEO Table Styling ---- */
-    #cardNeo table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    #cardNeo th, #cardNeo td {
-      border-bottom: 1px solid var(--border);
-      padding: 8px 10px;
-      text-align: left;
-      vertical-align: top;
-      font-size: 0.9rem;
-    }
-    #cardNeo th {
-      color: var(--accent-light);
-      font-weight: 600;
-      border-bottom: 2px solid var(--accent-light);
-    }
-    #cardNeo tr:hover { background: rgba(255,255,255,0.05); }
-  </style>
+/* ===== Dashboard Layout ===== */
+main {
+  display: flex;
+  gap: 22px;
+  flex: 1;
+  padding: 22px;
+}
+
+/* ===== Sidebar Controls ===== */
+.controls {
+  width: 300px;
+  background: var(--panel);
+  padding: 22px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.controls h3 {
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--accent-light);
+}
+
+label { display: block; margin-top: 14px; font-size: 0.95rem; }
+
+select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+}
+
+button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: 0.25s;
+}
+button:hover {
+  background: var(--accent-light);
+}
+
+/* ===== Main Grid ===== */
+.dashboard {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 22px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.card h3 {
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--accent-light);
+}
+
+/* ===== Generic Tables ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 0.92rem;
+}
+
+th {
+  text-align: left;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  color: var(--accent-light);
+}
+
+td {
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* ===== Missions ===== */
+.mission {
+  background: var(--panel);
+  padding: 14px;
+  border-radius: 6px;
+  border-left: 4px solid var(--accent);
+  margin-bottom: 8px;
+  line-height: 1.45;
+}
+
+/* ===== Loader Overlay ===== */
+#loader {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 17, 23, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: var(--accent-light);
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.spinner {
+  border: 4px solid rgba(255,255,255,0.15);
+  border-top: 4px solid var(--accent-light);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 14px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== Footer ===== */
+footer {
+  padding: 16px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+</style>
+
+    
+    
 </head>
 
 <body>

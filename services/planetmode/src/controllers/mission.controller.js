@@ -65,14 +65,42 @@ exports.getLandingMissions = async (req, res) => {
     const gemini = req.app.locals.gemini;
     const { planet = "Moon", vehicle = "Starship", count = 3 } = req.query;
     const maxCount = Math.min(5, Number(count));
-
     const prompt = `
-Generate ${maxCount} fictional planetary landing missions as JSON.
-Each mission must include missionName, era, status, scenario, scoring, and comparison.
-Prefer missions targeting "${planet}" using vehicle "${vehicle}".
-Return a JSON array.
-`;
-
+    Return ONLY a valid JSON array. No markdown. No explanation. No extra text.
+    
+    Each item MUST follow EXACTLY this schema:
+    
+    {
+      "missionName": "string",
+      "era": "string",
+      "status": "string",
+      "scenario": {
+        "vehicle": { "name": "string" },
+        "bodyId": "string",
+        "landingSite": { "name": "string" },
+        "approach": {
+          "descentProfile": "string",
+          "entryAngle": number
+        }
+      },
+      "scoring": {
+        "scientificValue": number,
+        "safety": number,
+        "efficiency": number,
+        "overall": number
+      },
+      "comparison": {
+        "historicalBaseline": "apollo11",
+        "improvement": number,
+        "industryAverage": number
+      },
+      "isPublic": true
+    }
+    
+    Generate EXACTLY ${maxCount} missions targeting "${planet}" using "${vehicle}".
+    Return ONLY the JSON array.
+    `;
+    
     try {
       const ai = await gemini.generateContent(prompt);
       let missions = [];
@@ -83,17 +111,17 @@ Return a JSON array.
 
       res.json({ ok: true, source: "gemini", missions });
     } catch (err) {
-      console.warn("⚠️ Gemini mission generation failed:", err.message);
+      console.warn("Gemini mission generation failed:", err.message);
       const fallback = Array.from({ length: maxCount }, () => getRandomMission());
       res.json({ ok: true, source: "fallback", missions: fallback });
     }
   } catch (err) {
-    console.error("❌ Error in getLandingMissions:", err);
+    console.error("Error in getLandingMissions:", err);
     res.status(500).json({ error: err.message });
   }
 };
 
-/* ---------- 2. Hardcoded full mission bundle ---------- */
+/* ----------  full mission bundle ---------- */
 exports.getMissionBundle = async (req, res) => {
   try {
     const { id } = req.params;

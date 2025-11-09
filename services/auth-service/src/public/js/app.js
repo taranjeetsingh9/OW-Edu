@@ -5,7 +5,7 @@ const SERVICES = {
     // Comment out services that aren't running yet
     'greenlaunch': { port: 4020, name: 'GreenLaunch' },
     // 'orbitwatch': { port: 4030, name: 'OrbitWatch' },
-    // 'planetmode': { port: 4040, name: 'Planet Mode' }
+    'planetmode': { port: 4040, name: 'Planet Mode' }
 };
 
 // Check service status on page load

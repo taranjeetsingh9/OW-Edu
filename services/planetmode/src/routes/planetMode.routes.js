@@ -7,7 +7,7 @@ const axios = require("axios");
 const { simulation, mission } = require("../controllers");
 
 /* ---------------------- Health Check ---------------------- */
-router.get("/", (req, res) => res.send("🌍 PlanetMode routes active ✅"));
+router.get("/", (req, res) => res.send("PlanetMode routes active "));
 
 /* ---------------------- Simulation Routes ---------------------- */
 router.get("/config", simulation.getSimulationConfig);
@@ -30,20 +30,27 @@ router.post("/gemini-simulate", async (req, res) => {
 
   // ---------- 1. Gemini Simulation ----------
   const prompt = `
-Simulate a ${planet} landing using ${vehicle} at ${site}.
-Respond with JSON only:
-{
- "results": {
-   "craterDiameter": "10 m",
-   "dustRadius": "50 m",
-   "seismicMagnitude": "M 3.2",
-   "contaminationLevel": 2,
-   "environmentalScore": 92
- },
- "summary": "Short description",
- "risks": ["..."],
- "recommendations": ["..."]
-}`;
+  Return ONLY valid JSON. No markdown. No explanation. No extra text.
+  If unsure, return {}.
+  
+  {
+    "results": {
+      "craterDiameter": "string",
+      "dustRadius": "string",
+      "seismicMagnitude": "string",
+      "contaminationLevel": number,
+      "environmentalScore": number
+    },
+    "summary": "string",
+    "risks": ["string"],
+    "recommendations": ["string"]
+  }
+  
+  Simulate a landing on ${planet} using the vehicle ${vehicle} at the site ${site}.
+  Fill the JSON fields with realistic simulated values.
+  Return ONLY the JSON object above.
+  `;
+  
 
   let aiData;
   try {

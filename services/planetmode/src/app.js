@@ -10,24 +10,26 @@ const planetModeRoutes = require("./routes/planetMode.routes");
 
 dotenv.config();
 
+
 const app = express();
-const PORT = process.env.PLANETMODE_PORT || 4000;
+const PORT = 4040;
 const MONGO_URI = process.env.MONGO_URI;
 
 /* ---------------------- Middleware ---------------------- */
 app.use(cors());
 app.use(express.json());
 
+
 /* ---------------------- MongoDB ---------------------- */
 if (MONGO_URI) {
   mongoose
     .connect(MONGO_URI)
-    .then(() => console.log("✅ MongoDB connected"))
+    .then(() => console.log("MongoDB connected"))
     .catch((err) =>
-      console.error("❌ MongoDB connection error:", err.message)
+      console.error(" MongoDB connection error:", err.message)
     );
 } else {
-  console.warn("⚠️ MONGO_URI not set — skipping database connection.");
+  console.warn("MONGO_URI not set — skipping database connection.");
 }
 
 /* ---------------------- GeminiService (inline) ---------------------- */
@@ -55,11 +57,11 @@ class GeminiService {
       try {
         return JSON.parse(raw);
       } catch {
-        console.warn("⚠️ Gemini returned non-JSON output, using fallback text.");
+        console.warn("Gemini returned non-JSON output, using fallback text.");
         return { text: raw };
       }
     } catch (err) {
-      console.error("❌ Gemini API request failed:", err.message);
+      console.error(" Gemini API request failed:", err.message);
       throw err;
     }
   }
@@ -83,7 +85,7 @@ app.get("/", (req, res) => {
 
 /* ---------------------- Server Start ---------------------- */
 app.listen(PORT, () => {
-  console.log(`🚀 PlanetMode service running at http://localhost:${PORT}`);
+  console.log(` PlanetMode service running at http://localhost:${PORT}`);
 
   if (!process.env.GEMINI_API_KEY)
     console.warn("⚠️ GEMINI_API_KEY not set — fallback mode active.");
