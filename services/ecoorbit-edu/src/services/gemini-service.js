@@ -9,7 +9,7 @@ class GeminiService {
   async generateContent(prompt) {
     try {
       if (!this.apiKey) {
-        console.log('❌ GEMINI_API_KEY not configured');
+        console.log(' GEMINI_API_KEY not configured');
         return this.getEnhancedMockResponse();
       }
 
@@ -40,7 +40,7 @@ class GeminiService {
         }
       );
 
-      console.log('✅ Gemini API success!');
+      console.log(' Gemini API success!');
       
       if (response.data && response.data.candidates && response.data.candidates[0]) {
         return response.data.candidates[0].content.parts[0].text;
@@ -50,8 +50,8 @@ class GeminiService {
       }
       
     } catch (error) {
-      console.error('❌ Gemini API Error:', error.response?.status, error.message);
-      console.log('🔄 Using enhanced mock response');
+      console.error(' Gemini API Error:', error.response?.status, error.message);
+      console.log(' Using enhanced mock response');
       return this.getEnhancedMockResponse();
     }
   }
@@ -107,7 +107,7 @@ Make it interactive, educational, and age-appropriate for grade ${grade}. Focus 
   getEnhancedMockResponse(grade = 6, topic = "rocket propulsion", learningObjectives = "Understand basic rocket propulsion", curriculumCode = "E2.2") {
     const scenarios = {
       'E2.2': {
-        title: "🚀 Water vs Nitrogen Rocket Propellant Mission",
+        title: " Water vs Nitrogen Rocket Propellant Mission",
         description: "Grade 6 students compare the efficiency and environmental impact of different rocket propellants in this exciting space mission! Discover why nitrogen is better than water for rocket fuel through hands-on experiments.",
         mission: "Test and compare water and nitrogen as rocket propellants, analyzing performance, efficiency, and environmental impact",
         activities: [
@@ -132,7 +132,7 @@ Make it interactive, educational, and age-appropriate for grade ${grade}. Focus 
         }
       },
       'D2.3': {
-        title: "💧 Rocket Fluid Dynamics Mission",
+        title: " Rocket Fluid Dynamics Mission",
         description: "Grade 8 students explore fluid dynamics principles as they apply to rocket propulsion systems and spacecraft design.",
         mission: "Investigate fluid behavior in rocket engines and spacecraft systems",
         activities: [
@@ -151,7 +151,7 @@ Make it interactive, educational, and age-appropriate for grade ${grade}. Focus 
     };
 
     const scenario = scenarios[curriculumCode] || {
-      title: `🚀 Grade ${grade} ${topic} Mission`,
+      title: ` Grade ${grade} ${topic} Mission`,
       description: `Explore ${topic} through interactive space science activities aligned with Ontario Grade ${grade} curriculum.`,
       mission: `Learn about ${topic} and master: ${learningObjectives}`,
       activities: [
