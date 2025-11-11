@@ -13,10 +13,10 @@ class GeminiService {
         return this.getEnhancedMockResponse();
       }
 
-      console.log('🤖 Calling Gemini API...');
+      console.log('calling Gemini API...');
       
       const response = await axios.post(
-        `${this.baseUrl}/gemini-2.0-flash:generateContent?key=${this.apiKey}`,
+        `${this.baseUrl}/gemini-2.0-flash:generateContent?key=${this.apiKey}`, // it's free model and serve our purpose also converting gemini response to JSON is hard but ready for challenge
         {
           contents: [
             {
